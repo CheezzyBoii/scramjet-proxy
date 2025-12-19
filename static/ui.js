@@ -27,6 +27,168 @@ const col = css`
 
 connection.setTransport(store.transport, [{ wisp: store.wispurl }]);
 
+// History utilities
+const HISTORY_KEY = "scramjet_history";
+function loadHistory() {
+	try {
+		const raw = localStorage.getItem(HISTORY_KEY);
+		const arr = raw ? JSON.parse(raw) : [];
+		// dedupe by normalized url, keep first occurrence (newest-first)
+		const seen = new Set();
+		const result = [];
+		for (const it of arr) {
+			try {
+				const n = normalizeUrl(it.url || "");
+				if (seen.has(n)) continue;
+				seen.add(n);
+				result.push(it);
+			} catch (_) {
+				if (!seen.has(it.url)) {
+					seen.add(it.url);
+					result.push(it);
+				}
+			}
+		}
+		return result;
+	} catch (e) {
+		return [];
+	}
+}
+function normalizeUrl(u) {
+	try {
+		let url = new URL(u);
+		// remove hash
+		url.hash = "";
+		// normalize pathname: remove trailing slash except for root
+		if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
+			url.pathname = url.pathname.replace(/\/+$/, "");
+		}
+		return url.origin + url.pathname + url.search;
+	} catch (e) {
+		return u;
+	}
+}
+
+function History() {
+	this.css = `
+    transition: opacity 0.4s ease;
+    :modal[open] { animation: fade 0.4s ease normal; }
+    :modal::backdrop { backdrop-filter: blur(3px); }
+    .hist-list { max-height: 40vh; overflow: auto; }
+    .hist-item { padding: 8px; border-bottom: 1px solid #333; cursor: pointer; display:flex; flex-direction: column; gap:4px; }
+    .hist-item:hover { background-color: rgba(255, 140, 0, 0.1); }
+    .hist-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 480px; }
+    .hist-url { color: #ff8c00; font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 480px; }
+    .hist-meta { color: #999; font-size: 0.8em; }
+    .buttons { gap: 0.5em; }
+    .buttons button { border: 1px solid #ff8c00; background-color: #1a1a1a; border-radius: 0.75em; color: #fff; padding: 0.45em; transition: all 0.2s ease; }
+    .buttons button:hover { background-color: rgba(255, 140, 0, 0.15); }
+  `;
+
+	function handleClose(modal) {
+		modal.style.opacity = 0;
+		setTimeout(() => {
+			modal.close();
+			modal.style.opacity = 1;
+		}, 200);
+	}
+
+	return html`
+		<dialog
+			class="history"
+			style="background-color: #0d0d0d; color: white; border-radius: 8px; width: 520px; border: 1px solid #ff8c00;"
+		>
+			<h3 style="color: #ff8c00; margin-top: 0;">History</h3>
+			<div class="hist-list"></div>
+			<div class=${[flex, "buttons", "centered"]} style="margin-top:8px;">
+				<button class="clear">Clear history</button>
+				<button class="close">Close</button>
+			</div>
+		</dialog>
+	`;
+}
+
+// Render history into any open history dialog
+function renderHistoryDialog() {
+	const listEl = document.querySelector(".history .hist-list");
+	if (!listEl) return;
+	const entries = loadHistory();
+	if (!entries.length) {
+		listEl.innerHTML = '<div style="padding:8px;color:gray">No history</div>';
+		return;
+	}
+	listEl.innerHTML = entries
+		.map((e) => {
+			const d = new Date(e.ts);
+			const time = d.toLocaleString();
+			let title = e.title;
+			try {
+				if (!title) {
+					// use hostname as fallback title
+					title = new URL(e.url).hostname;
+				}
+			} catch (_) {
+				title = e.url;
+			}
+
+			return `
+        <div class="hist-item" data-url="${escapeHtml(e.url)}">
+          <div class="hist-title">${escapeHtml(title)}</div>
+          <div class="hist-url">${escapeHtml(e.url)}</div>
+          <div class="hist-meta">${time}</div>
+        </div>`;
+		})
+		.join("");
+
+	// attach click handlers
+	listEl.querySelectorAll(".hist-item").forEach((el) => {
+		el.addEventListener("click", (ev) => {
+			const url = el.getAttribute("data-url");
+			// move this entry to top with updated timestamp (use normalized comparison)
+			const entries = loadHistory();
+			const norm = normalizeUrl(url);
+			const i = entries.findIndex((en) => normalizeUrl(en.url) === norm);
+			if (i !== -1) {
+				const item = entries.splice(i, 1)[0];
+				item.ts = Date.now();
+				entries.unshift(item);
+				saveHistory(entries);
+			}
+			document.dispatchEvent(
+				new CustomEvent("history:navigate", { detail: url })
+			);
+		});
+	});
+}
+
+function escapeHtml(str) {
+	return String(str).replace(
+		/[&<>\"]/g,
+		(s) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[s]
+	);
+}
+function saveHistory(arr) {
+	try {
+		localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+	} catch (e) {}
+}
+function addHistory(url) {
+	if (!url) return;
+	const entries = loadHistory();
+	const norm = normalizeUrl(url);
+	// remove existing entry for same normalized url to avoid duplicates
+	const idx = entries.findIndex((e) => e && normalizeUrl(e.url) === norm);
+	if (idx !== -1) entries.splice(idx, 1);
+	// insert new entry; title may be undefined (will be resolved in render)
+	entries.unshift({ url, norm, title: undefined, ts: Date.now() });
+	// keep reasonable length
+	if (entries.length > 200) entries.length = 200;
+	saveHistory(entries);
+}
+function clearHistory() {
+	saveHistory([]);
+}
+
 function Config() {
 	this.css = `
     transition: opacity 0.4s ease;
@@ -42,19 +204,28 @@ function Config() {
       gap: 0.5em;
     }
     .buttons button {
-      border: 1px solid #4c8bf5;
-      background-color: #313131;
+      border: 1px solid #ff8c00;
+      background-color: #1a1a1a;
       border-radius: 0.75em;
       color: #fff;
       padding: 0.45em;
+      transition: all 0.2s ease;
+    }
+    .buttons button:hover {
+      background-color: rgba(255, 140, 0, 0.15);
     }
     .input_row input {
       background-color: rgb(18, 18, 18);
-      border: 2px solid rgb(49, 49, 49);
+      border: 2px solid #ff8c00;
       border-radius: 0.75em;
       color: #fff;
       outline: none;
       padding: 0.45em;
+      transition: border-color 0.2s ease;
+    }
+    .input_row input:focus {
+      border-color: #ffa500;
+      box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
     }
     .input_row {
       margin-bottom: 0.5em;
@@ -78,11 +249,12 @@ function Config() {
 	}
 
 	return html`
-      <dialog class="cfg" style="background-color: #121212; color: white; border-radius: 8px;">
+      <dialog class="cfg" style="background-color: #0d0d0d; color: white; border-radius: 8px; border: 1px solid #ff8c00;">
+        <h3 style="color: #ff8c00; margin-top: 0;">Configuration</h3>
         <div style="align-self: end">
           <div class=${[flex, "buttons"]}>
             <button on:click=${() => {
-							connection.setTransport("/baremod/index.mjs", [store.bareurl]);
+							connection.setTransport("/baremod/index.mjs", []);
 							store.transport = "/baremod/index.mjs";
 						}}>use bare server 3</button>
             <button on:click=${() => {
@@ -127,7 +299,7 @@ function BrowserApp() {
     box-sizing: border-box;
 
     a {
-      color: #e0def4;
+      color: #ff8c00;
     }
 
     input,
@@ -141,13 +313,25 @@ function BrowserApp() {
       font-family: "Inter Tight", "Inter", system-ui, -apple-system, BlinkMacSystemFont,
       sans-serif;
       margin-bottom: 0;
+      color: #ff8c00;
     }
     iframe {
       background-color: #fff;
       border: none;
-      border-radius: 0.3em;
+      box-shadow: none;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
       flex: 1;
       width: 100%;
+      display: block;
+    }
+
+    /* catch any wrapper or internal borders */
+    iframe, iframe * {
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
     }
 
     input.bar {
@@ -161,12 +345,17 @@ function BrowserApp() {
       border-radius: 0.3em;
       flex: 1;
 
-      background-color: #121212;
-      border: 1px solid #313131;
+      background-color: #1a1a1a;
+      border: 1px solid #ff8c00;
+      transition: all 0.2s ease;
+    }
+    input.bar:focus {
+      border-color: #ffa500;
+      box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
     }
     .input_row > label {
       font-size: 0.7rem;
-      color: gray;
+      color: #ff8c00;
     }
     p {
       margin: 0;
@@ -177,6 +366,7 @@ function BrowserApp() {
       padding-top: 0.3em;
       padding-bottom: 0.3em;
       gap: 0.3em;
+      border-bottom: 1px solid #ff8c00;
     }
     spacer {
       margin-left: 10em;
@@ -185,10 +375,14 @@ function BrowserApp() {
     .nav button {
       color: #fff;
       outline: none;
-      border: none;
+      border: 1px solid #ff8c00;
       border-radius: 0.30em;
-      background-color: #121212;
-      border: 1px solid #313131;
+      background-color: #1a1a1a;
+      transition: all 0.2s ease;
+    }
+    .nav button:hover {
+      background-color: rgba(255, 140, 0, 0.15);
+      box-shadow: 0 0 8px rgba(255, 140, 0, 0.2);
     }
   `;
 	this.url = store.url;
@@ -197,14 +391,113 @@ function BrowserApp() {
 
 	this.mount = () => {
 		let body = btoa(
-			`<body style="background: #000; color: #fff">Welcome to <i>Scramjet</i>! Type in a URL in the omnibox above and press enter to get started.</body>`
+			`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cheese Proxy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      color: #e0def4;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      min-width: 100vw;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 3em;
+      text-align: center;
+    }
+    h1 {
+      font-size: 4em;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5em;
+      letter-spacing: -0.02em;
+    }
+    p {
+      font-size: 1.2em;
+      color: #999;
+      margin-bottom: 2em;
+    }
+    .buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1em;
+      margin-top: 1em;
+    }
+    .site-btn {
+      padding: 1em 2em;
+      background-color: #1a1a1a;
+      border: 2px solid #ff8c00;
+      color: #fff;
+      font-size: 1.1em;
+      font-weight: 600;
+      border-radius: 0.5em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .site-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 140, 0, 0.2) 0%, rgba(255, 165, 0, 0.1) 100%);
+      box-shadow: 0 0 20px rgba(255, 140, 0, 0.4);
+      transform: translateY(-2px);
+    }
+    .site-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cheese Proxy</h1>
+    <p>Type a URL in the omnibox above or choose a popular site</p>
+    <div class="buttons-grid">
+      <button class="site-btn" onclick="window.parent.postMessage({type:'loadUrl',url:'https://crazygames.com'},'*')">Crazy Games</button>
+      <button class="site-btn" onclick="window.parent.postMessage({type:'loadUrl',url:'https://google.com'},'*')">Google</button>
+      <button class="site-btn" onclick="window.parent.postMessage({type:'loadUrl',url:'https://github.com'},'*')">GitHub</button>
+      <button class="site-btn" onclick="window.parent.postMessage({type:'loadUrl',url:'https://youtube.com'},'*')">YouTube</button>
+    </div>
+  </div>
+</body>
+</html>`
 		);
 		frame.go(`data:text/html;base64,${body}`);
 	};
 
+	// Listen for messages from the welcome page
+	window.addEventListener("message", (e) => {
+		if (e.data && e.data.type === "loadUrl" && e.data.url) {
+			this.url = e.data.url;
+			return handleSubmit();
+		}
+	});
+
 	frame.addEventListener("urlchange", (e) => {
 		if (!e.url) return;
 		this.url = e.url;
+		if (e.url && e.url.startsWith("http")) addHistory(e.url);
 	});
 
 	const handleSubmit = () => {
@@ -214,38 +507,130 @@ function BrowserApp() {
 			this.url = "https://" + this.url;
 		}
 
+		addHistory(this.url);
+
 		return frame.go(this.url);
 	};
 
 	const cfg = h(Config);
+	const hist = h(History);
 	document.body.appendChild(cfg);
+	document.body.appendChild(hist);
+
+	// Overlay for modal blur
+	let __scramjet_modal_overlay = null;
+	function createBlurOverlay() {
+		if (__scramjet_modal_overlay) return __scramjet_modal_overlay;
+		const o = document.createElement("div");
+		o.id = "scramjet-modal-overlay";
+		Object.assign(o.style, {
+			position: "fixed",
+			inset: "0",
+			zIndex: 99990,
+			backdropFilter: "blur(3px)",
+			background: "rgba(0,0,0,0.15)",
+		});
+		document.body.appendChild(o);
+		__scramjet_modal_overlay = o;
+		return o;
+	}
+	function removeBlurOverlay() {
+		if (!__scramjet_modal_overlay) return;
+		try {
+			__scramjet_modal_overlay.remove();
+		} catch (_) {}
+		__scramjet_modal_overlay = null;
+	}
+	function showHistoryModal() {
+		renderHistoryDialog();
+		createBlurOverlay();
+		const dialogEl = document.querySelector(".history");
+		if (dialogEl) {
+			dialogEl.style.zIndex = "99999";
+			try {
+				dialogEl.showModal();
+			} catch (e) {
+				console.error("showModal failed:", e);
+			}
+		}
+	}
+
+	// Wire up history dialog controls
+	document.addEventListener("history:navigate", (e) => {
+		const url = e.detail;
+		if (!url) return;
+		frame.go(url);
+		// close dialog
+		const dialogEl = document.querySelector(".history");
+		if (dialogEl) {
+			try {
+				dialogEl.close();
+			} catch {}
+		}
+	});
+
+	// Clear and close handlers when dialog exists
+	function bindHistoryControls() {
+		const root = document.querySelector(".history");
+		if (!root) return;
+		const clearBtn = root.querySelector(".clear");
+		const closeBtn = root.querySelector(".close");
+		if (clearBtn)
+			clearBtn.onclick = () => {
+				clearHistory();
+				renderHistoryDialog();
+			};
+		if (closeBtn)
+			closeBtn.onclick = () => {
+				try {
+					root.close();
+				} catch {}
+			};
+		// remove overlay when dialog closes
+		if (!root.__boundClose) {
+			root.addEventListener("close", () => removeBlurOverlay());
+			root.__boundClose = true;
+		}
+	}
+
+	// Ensure controls are bound when dialog is opened
+	const obs = new MutationObserver(() => bindHistoryControls());
+	obs.observe(document.body, { childList: true, subtree: true });
 	this.githubURL = `https://github.com/MercuryWorkshop/scramjet/commit/${$scramjetVersion.build}`;
 
 	return html`
       <div>
       <div class=${[flex, "nav"]}>
 
+        <img src="./devtoolsimgs/Logo.png" style="height: 1.5em; margin-right: 0.5em;" />
+
         <button on:click=${() => cfg.showModal()}>config</button>
         <button on:click=${() => frame.back()}>&lt;-</button>
         <button on:click=${() => frame.forward()}>-&gt;</button>
         <button on:click=${() => frame.reload()}>&#x21bb;</button>
-
+        <button on:click=${() => (window.eruditState ? (eruda.hide(), (window.eruditState = false)) : (eruda.show(), (window.eruditState = true)))}>console</button>
         <input class="bar" autocomplete="off" autocapitalize="off" autocorrect="off" 
         bind:value=${use(this.url)} on:input=${(e) => {
 					this.url = e.target.value;
 				}} on:keyup=${(e) => e.keyCode == 13 && (store.url = this.url) && handleSubmit()}></input>
 
         <button on:click=${() => window.open(scramjet.encodeUrl(this.url))}>open</button>
-
-        <p class="version">
-          <b>scramjet</b> ${$scramjetVersion.version} <a href=${use(this.githubURL)}>${$scramjetVersion.build}</a>
-        </p>
+        <button on:click=${() => {
+					showHistoryModal();
+				}}>history</button>
       </div>
       ${frame.frame}
     </div>
     `;
 }
 window.addEventListener("load", async () => {
+	// Initialize eruda console without entry button
+	if (window.eruda) {
+		window.eruda.init();
+		window.eruda.get("entryBtn").hide();
+		window.eruditState = false;
+	}
+
 	const root = document.getElementById("app");
 	try {
 		root.replaceWith(h(BrowserApp));
