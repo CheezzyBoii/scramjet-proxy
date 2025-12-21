@@ -37,6 +37,6 @@ window.addEventListener("load", async () => {
 		`
 		);
 	} catch (e) {
-		console.log("🧀 Cheese Proxy - Powered by Scramjet");
+		console.log("The Cheesy Proxy - Built on top of Scramjet");
 	}
 });

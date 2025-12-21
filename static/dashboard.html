@@ -75,22 +75,202 @@
 			.proxy-btn:active {
 				transform: translateY(-1px);
 			}
+
+			.search-container {
+				margin: 2rem 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.search-wrapper {
+				position: relative;
+				width: 350px;
+				height: 44px;
+			}
+
+			.search-wrapper::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				border: 3px solid transparent;
+				border-radius: 0.5rem;
+				background:
+					linear-gradient(#1a1a1a, #1a1a1a) padding-box,
+					conic-gradient(from 0deg, #ff8c00, #ffa500, #ff8c00) border-box;
+				pointer-events: none;
+				animation: snakeBorder 4s linear infinite;
+			}
+
+			@keyframes snakeBorder {
+				0% {
+					filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.3));
+				}
+				50% {
+					filter: drop-shadow(0 0 20px rgba(255, 165, 0, 0.5));
+				}
+				100% {
+					filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.3));
+				}
+			}
+
+			.search-wrapper::after {
+				content: "";
+				position: absolute;
+				top: 3px;
+				left: 3px;
+				right: 3px;
+				bottom: 3px;
+				border-radius: 3px;
+				pointer-events: none;
+				animation: snakeBorderShine 4s linear infinite;
+			}
+
+			@keyframes snakeBorderShine {
+				0% {
+					box-shadow: inset 0 0 0 rgba(255, 140, 0, 0);
+				}
+				50% {
+					box-shadow: inset 0 0 10px rgba(255, 140, 0, 0.1);
+				}
+				100% {
+					box-shadow: inset 0 0 0 rgba(255, 140, 0, 0);
+				}
+			}
+
+			.search-input {
+				position: absolute;
+				top: 3px;
+				left: 3px;
+				right: 3px;
+				bottom: 3px;
+				padding: 0.9rem 1.2rem;
+				background-color: #1a1a1a;
+				border: none;
+				border-radius: 3px;
+				color: #fff;
+				font-size: 1rem;
+				outline: none;
+				transition: all 0.3s ease;
+				width: calc(100%-5px);
+			}
+
+			.search-input::placeholder {
+				color: #666;
+			}
+
+			.search-input:focus {
+				box-shadow: inset 0 0 15px rgba(255, 140, 0, 0.2);
+			}
+
+			.wave-text {
+				display: inline-block;
+			}
+
+			.wave-text span {
+				display: inline-block;
+				animation: wave 2s ease-in-out infinite;
+			}
+
+			@keyframes wave {
+				0%,
+				100% {
+					transform: translateY(0);
+				}
+				50% {
+					transform: translateY(-20px);
+				}
+			}
 		</style>
 	</head>
 	<body>
 		<div class="landing-container">
 			<h1>
 				<img src="/devtoolsimgs/Logo.png" alt="Cheese Proxy" />
-				Cheesy Bread Proxy
 			</h1>
+			<h1 id="waveTitle">The Cheesy Proxy</h1>
 			<p>
-				Welcome to The Cheese Proxy! Experience a fast, secure, and reliable
+				Welcome to The Cheesy Proxy! Experience a fast, secure, and reliable
 				proxy.
 			</p>
 			<p>This proxy was built using Scramjet, a powerful web Proxy.</p>
-			<button class="proxy-btn" onclick="window.open('/playground.html');">
-				Open Proxy
-			</button>
+
+			<div class="search-container">
+				<div class="search-wrapper">
+					<input
+						type="text"
+						id="searchInput"
+						class="search-input"
+						placeholder="Enter URL or search..."
+						onkeypress="handleSearchKeypress(event)"
+					/>
+				</div>
+			</div>
+
+			<script>
+				function waveTextEffect(elementId) {
+					const element = document.getElementById(elementId);
+					if (!element) return;
+
+					const text = element.textContent.trim();
+					element.innerHTML = "";
+
+					text.split("").forEach((char, index) => {
+						const span = document.createElement("span");
+						span.textContent = char;
+						span.style.animationDelay = index * 0.05 + "s";
+						element.appendChild(span);
+					});
+
+					element.classList.add("wave-text");
+				}
+
+				// Apply wave effect on page load
+				document.addEventListener("DOMContentLoaded", () => {
+					waveTextEffect("waveTitle");
+					waveTextEffect("waveP1");
+					waveTextEffect("waveP2");
+				});
+
+				function handleSearch() {
+					const query = document.getElementById("searchInput").value.trim();
+					if (query) {
+						// If it doesn't start with http, assume it's a URL that needs the protocol
+						let url = query;
+						if (!url.startsWith("http://") && !url.startsWith("https://")) {
+							// Check if it looks like a URL or a search query
+							if (url.includes(".") && !url.includes(" ")) {
+								url = "https://" + url;
+							} else {
+								// It's a search query, use DuckDuckGo
+								url =
+									"https://www.duckduckgo.com/?q=" + encodeURIComponent(query);
+							}
+						}
+						// Open the proxy with the URL in a new tab
+						const win = window.open("/playground.html");
+						// Pass the URL to the proxy when it loads
+						if (win) {
+							win.addEventListener("load", () => {
+								win.postMessage({ type: "loadUrl", url: url }, "*");
+							});
+							// Fallback in case the above doesn't work
+							setTimeout(() => {
+								win.postMessage({ type: "loadUrl", url: url }, "*");
+							}, 1000);
+						}
+					}
+				}
+
+				function handleSearchKeypress(event) {
+					if (event.key === "Enter") {
+						handleSearch();
+					}
+				}
+			</script>
 		</div>
 	</body>
 </html>

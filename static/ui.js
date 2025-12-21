@@ -201,114 +201,129 @@ function Config() {
     }
 
     .config-container {
-      padding: 1rem;
-      min-width: 450px;
+      padding: 2rem;
+      min-width: 520px;
+      max-height: 70vh;
+      overflow-y: auto;
     }
 
     .config-section {
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 140, 0, 0.05);
+      border: 1px solid rgba(255, 140, 0, 0.2);
+      border-radius: 12px;
     }
 
     .config-section h4 {
       color: #ff8c00;
-      margin-bottom: 0.75rem;
-      font-size: 1rem;
+      margin-bottom: 1rem;
+      margin-top: 0;
+      font-size: 1.1rem;
       font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
     .transport-buttons {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 0.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
       margin-bottom: 1rem;
     }
 
     .transport-btn {
-      border: 1px solid #ff8c00;
+      border: 2px solid #ff8c00;
       background-color: #1a1a1a;
-      border-radius: 0.5rem;
+      border-radius: 8px;
       color: #fff;
-      padding: 0.75rem;
-      transition: all 0.2s ease;
+      padding: 0.9rem;
+      transition: all 0.3s ease;
       cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 500;
+      font-size: 0.95rem;
+      font-weight: 600;
     }
 
     .transport-btn:hover {
-      background-color: rgba(255, 140, 0, 0.2);
-      box-shadow: 0 0 12px rgba(255, 140, 0, 0.3);
-      transform: translateY(-2px);
+      background-color: rgba(255, 140, 0, 0.15);
+      box-shadow: 0 0 15px rgba(255, 140, 0, 0.4);
+      transform: translateY(-3px);
     }
 
     .transport-btn.active {
       background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
       border-color: #ffa500;
+      box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
     }
 
     .input-group {
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
     }
 
     .input-group label {
       display: block;
       color: #e0def4;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-      font-weight: 500;
+      margin-bottom: 0.6rem;
+      font-size: 0.95rem;
+      font-weight: 600;
     }
 
     .input-group input {
       width: 100%;
-      background-color: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 140, 0, 0.3);
-      border-radius: 0.5rem;
+      background-color: #0a0a0a;
+      border: 2px solid rgba(255, 140, 0, 0.3);
+      border-radius: 8px;
       color: #fff;
       outline: none;
-      padding: 0.75rem;
-      transition: all 0.2s ease;
+      padding: 0.85rem;
+      transition: all 0.3s ease;
       font-family: inherit;
+      font-size: 0.95rem;
     }
 
     .input-group input:focus {
       border-color: #ff8c00;
-      box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
+      box-shadow: 0 0 12px rgba(255, 140, 0, 0.4);
+      background-color: rgba(255, 140, 0, 0.02);
     }
 
     .transport-display {
-      padding: 0.75rem;
-      background: rgba(255, 140, 0, 0.1);
-      border: 1px solid rgba(255, 140, 0, 0.3);
-      border-radius: 0.5rem;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(255, 140, 0, 0.2);
+      border-radius: 8px;
       color: #ff8c00;
       font-family: 'Courier New', monospace;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      margin-top: 0.75rem;
+      word-break: break-all;
     }
 
     .config-footer {
       display: flex;
       justify-content: flex-end;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255, 140, 0, 0.3);
+      gap: 0.75rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 140, 0, 0.2);
     }
 
     .btn-close {
-      border: 1px solid #ff8c00;
+      border: 2px solid #ff8c00;
       background-color: #1a1a1a;
-      border-radius: 0.5rem;
+      border-radius: 8px;
       color: #fff;
-      padding: 0.6rem 1.5rem;
-      transition: all 0.2s ease;
+      padding: 0.8rem 1.8rem;
+      transition: all 0.3s ease;
       cursor: pointer;
       font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
     }
 
     .btn-close:hover {
-      background-color: rgba(255, 140, 0, 0.15);
-      box-shadow: 0 0 8px rgba(255, 140, 0, 0.2);
+      background-color: rgba(255, 140, 0, 0.2);
+      box-shadow: 0 0 12px rgba(255, 140, 0, 0.3);
+      transform: translateY(-2px);
     }
   `;
 
@@ -402,6 +417,50 @@ function BrowserApp() {
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
         sans-serif;
     }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(3px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .loader {
+      width: 55px;
+      aspect-ratio: 1;
+      --g1:conic-gradient(from 90deg at top 3px left 3px,#0000 90deg,#ff8c00 0);
+      --g2:conic-gradient(from -90deg at bottom 3px right 3px,#0000 90deg,#ff8c00 0);
+      background:
+        var(--g1),var(--g1),var(--g1),var(--g1), 
+        var(--g2),var(--g2),var(--g2),var(--g2);
+      background-position: 0 0,100% 0,100% 100%,0 100%;
+      background-size: 25px 25px;
+      background-repeat: no-repeat;
+      animation: l11 1.5s infinite;
+    }
+
+    @keyframes l11 {
+      0%   {background-size:35px 15px,15px 15px,15px 35px,35px 35px}
+      25%  {background-size:35px 35px,15px 35px,15px 15px,35px 15px}
+      50%  {background-size:15px 35px,35px 35px,35px 15px,15px 15px}
+      75%  {background-size:15px 15px,35px 15px,35px 35px,15px 35px}
+      100% {background-size:35px 15px,15px 15px,15px 35px,35px 35px}
+    }
     .version {
     }
     h1 {
@@ -485,13 +544,33 @@ function BrowserApp() {
 	const frame = scramjet.createFrame();
 
 	this.mount = () => {
+		// Get custom title and favicon from settings
+		const customTitle = localStorage.getItem("custom-title") || "Cheese Proxy";
+		const customFavicon = localStorage.getItem("custom-favicon") || "";
+
+		// Set document title
+		document.title = customTitle;
+
+		// Remove any existing favicon links
+		document
+			.querySelectorAll("link[rel='icon']")
+			.forEach((link) => link.remove());
+
+		// Set favicon if custom one is provided
+		if (customFavicon) {
+			const faviconLink = document.createElement("link");
+			faviconLink.rel = "icon";
+			faviconLink.href = customFavicon + "?t=" + Date.now(); // Cache buster
+			document.head.appendChild(faviconLink);
+		}
+
 		let body = btoa(
 			`<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cheese Proxy</title>
+  <title>${customTitle}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -585,6 +664,7 @@ function BrowserApp() {
 	window.addEventListener("message", (e) => {
 		if (e.data && e.data.type === "loadUrl" && e.data.url) {
 			this.url = e.data.url;
+			showLoading();
 			return handleSubmit();
 		}
 	});
@@ -593,6 +673,7 @@ function BrowserApp() {
 		if (!e.url) return;
 		this.url = e.url;
 		if (e.url && e.url.startsWith("http")) addHistory(e.url);
+		showLoading();
 	});
 
 	const handleSubmit = () => {
@@ -603,6 +684,7 @@ function BrowserApp() {
 		}
 
 		addHistory(this.url);
+		showLoading();
 
 		return frame.go(this.url);
 	};
@@ -611,6 +693,87 @@ function BrowserApp() {
 	const hist = h(History);
 	document.body.appendChild(cfg);
 	document.body.appendChild(hist);
+
+	// Create loading overlay with global styles
+	const loadingOverlay = document.createElement("div");
+	loadingOverlay.className = "loading-overlay";
+	loadingOverlay.innerHTML = '<div class="loader"></div>';
+	document.body.appendChild(loadingOverlay);
+
+	// Add global styles for loading overlay if not already added
+	if (!document.getElementById("loading-overlay-styles")) {
+		const styleEl = document.createElement("style");
+		styleEl.id = "loading-overlay-styles";
+		styleEl.textContent = `
+			.loading-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: rgba(10, 10, 10, 0.95);
+				backdrop-filter: blur(3px);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 100000;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.3s ease;
+			}
+
+			.loading-overlay.active {
+				opacity: 1;
+				pointer-events: auto;
+			}
+
+			.loader {
+				width: 55px;
+				aspect-ratio: 1;
+				--g1:conic-gradient(from 90deg at top 3px left 3px,#0000 90deg,#ff8c00 0);
+				--g2:conic-gradient(from -90deg at bottom 3px right 3px,#0000 90deg,#ff8c00 0);
+				background:
+					var(--g1),var(--g1),var(--g1),var(--g1), 
+					var(--g2),var(--g2),var(--g2),var(--g2);
+				background-position: 0 0,100% 0,100% 100%,0 100%;
+				background-size: 25px 25px;
+				background-repeat: no-repeat;
+				animation: l11 1.5s infinite;
+			}
+
+			@keyframes l11 {
+				0%   {background-size:35px 15px,15px 15px,15px 35px,35px 35px}
+				25%  {background-size:35px 35px,15px 35px,15px 15px,35px 15px}
+				50%  {background-size:15px 35px,35px 35px,35px 15px,15px 15px}
+				75%  {background-size:15px 15px,35px 15px,35px 35px,15px 35px}
+				100% {background-size:35px 15px,15px 15px,15px 35px,35px 35px}
+			}
+		`;
+		document.head.appendChild(styleEl);
+	}
+
+	let loadingTimeout = null;
+
+	const showLoading = () => {
+		// Clear any existing timeout
+		if (loadingTimeout) clearTimeout(loadingTimeout);
+
+		loadingOverlay.classList.add("active");
+
+		// Auto-hide after 1.5 seconds
+		loadingTimeout = setTimeout(() => {
+			loadingOverlay.classList.remove("active");
+			loadingTimeout = null;
+		}, 1000);
+	};
+
+	const hideLoading = () => {
+		// Clear timeout if it exists
+		if (loadingTimeout) clearTimeout(loadingTimeout);
+
+		loadingOverlay.classList.remove("active");
+		loadingTimeout = null;
+	};
 
 	// Overlay for modal blur
 	let __scramjet_modal_overlay = null;
@@ -697,12 +860,20 @@ function BrowserApp() {
       <div>
       <div class=${[flex, "nav"]}>
 
-        <img src="./devtoolsimgs/Logo.png" style="height: 1.5em; margin-right: 0.5em;" />
+        <img src="./devtoolsimgs/Logo.png" style="height: 1.5em; margin-right: 0.5em; cursor: pointer; transition: transform 0.2s ease;" onclick="window.location.href='./'" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Back to Dashboard" />
 
-        <button on:click=${() => cfg.showModal()}>config</button>
-        <button on:click=${() => frame.back()}>&lt;-</button>
-        <button on:click=${() => frame.forward()}>-&gt;</button>
-        <button on:click=${() => frame.reload()}>&#x21bb;</button>
+        <button on:click=${() => {
+					showLoading();
+					frame.back();
+				}}>&lt;-</button>
+        <button on:click=${() => {
+					showLoading();
+					frame.forward();
+				}}>-&gt;</button>
+        <button on:click=${() => {
+					showLoading();
+					frame.reload();
+				}}>&#x21bb;</button>
         <button on:click=${() => (window.eruditState ? (eruda.hide(), (window.eruditState = false)) : (eruda.show(), (window.eruditState = true)))}>console</button>
         <input class="bar" autocomplete="off" autocapitalize="off" autocorrect="off" 
         bind:value=${use(this.url)} on:input=${(e) => {
@@ -710,6 +881,7 @@ function BrowserApp() {
 				}} on:keyup=${(e) => e.keyCode == 13 && (store.url = this.url) && handleSubmit()}></input>
 
         <button on:click=${() => window.open(scramjet.encodeUrl(this.url))}>open</button>
+        <button on:click=${() => cfg.showModal()}>config</button>
         <button on:click=${() => {
 					showHistoryModal();
 				}}>history</button>

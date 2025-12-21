@@ -164,65 +164,9 @@ function Dashboard() {
       margin-bottom: 2rem;
       font-size: 2rem;
     }
-
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1.5rem;
-      padding: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .game-card {
-      background-color: #1a1a1a;
-      border: 2px solid rgba(255, 140, 0, 0.3);
-      border-radius: 0.8rem;
-      padding: 2rem 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
-    .game-card:hover {
-      background: linear-gradient(135deg, rgba(255, 140, 0, 0.15) 0%, rgba(255, 165, 0, 0.1) 100%);
-      border-color: #ff8c00;
-      box-shadow: 0 0 20px rgba(255, 140, 0, 0.4);
-      transform: translateY(-4px);
-    }
-
-    .game-icon {
-      font-size: 3rem;
-    }
-
-    .game-name {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #e0def4;
-    }
   `;
 
 	this.activeView = "landing";
-	this.games = [
-		{ name: "1v1.lol", icon: "🎯", url: "https://1v1.lol" },
-		{ name: "Shell Shockers", icon: "🥚", url: "https://shellshock.io" },
-		{ name: "Krunker", icon: "", url: "https://krunker.io" },
-		{ name: "Slope", icon: "⛷️", url: "https://slope-game.github.io" },
-		{ name: "Run 3", icon: "🏃", url: "https://run3.io" },
-		{
-			name: "Cookie Clicker",
-			icon: "🍪",
-			url: "https://orteil.dashnet.org/cookieclicker",
-		},
-		{ name: "Tetris", icon: "🧱", url: "https://tetris.com" },
-		{ name: "Minesweeper", icon: "💣", url: "https://minesweeperonline.com" },
-		{ name: "Pac-Man", icon: "👾", url: "https://pacman.com" },
-		{ name: "Retro Bowl", icon: "🏈", url: "https://retrobowl.me" },
-	];
 
 	const switchView = (view) => {
 		this.activeView = view;
@@ -253,6 +197,15 @@ function Dashboard() {
 					<span class="icon-btn-tooltip">Home</span>
 				</button>
 
+				<!-- Proxy Icon -->
+				<button
+					onclick="window.open('/playground.html', '_blank')"
+					class="icon-btn"
+				>
+					<img src="/devtoolsimgs/p.svg" alt="Proxy" />
+					<span class="icon-btn-tooltip">Proxy</span>
+				</button>
+
 				<!-- Games Icon -->
 				<button
 					class="icon-btn ${this.activeView === "games" ? "active" : ""}"
@@ -278,6 +231,14 @@ function Dashboard() {
 				>
 					<img src="/devtoolsimgs/s.svg" alt="Settings" />
 					<span class="icon-btn-tooltip">Settings</span>
+				</button>
+				<!-- Discord Icon -->
+				<button
+					class="icon-btn"
+					onclick="window.open('https://dsc.gg/cheesy-proxy', '_blank')"
+				>
+					<img src="/devtoolsimgs/dc.svg" alt="Discord" />
+					<span class="icon-btn-tooltip">Discord</span>
 				</button>
 			</div>
 
