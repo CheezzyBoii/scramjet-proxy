@@ -1,0 +1,212 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta
+	name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=no"
+/>
+<link rel="stylesheet" href="style.css" />
+<div id="unity-container" class="unity-desktop">
+	<canvas
+		id="unity-canvas"
+		width="100%"
+		height="100%"
+		style="cursor: default"
+	></canvas>
+</div>
+<div id="loading-cover" style="display: none">
+	<div id="unity-loading-bar">
+		<div id="unity-logo">
+			<img src="https://codehs.com/uploads/5bbf446f52d738a0b4c4a97947a7b183" />
+		</div>
+		<div class="progress-spinner-container">
+			<div class="spinner-left">
+				<img
+					src="https://codehs.com/uploads/fc32d84f4cf713409d4567e4598f00aa"
+				/>
+			</div>
+			<div id="unity-progress-bar-empty">
+				<div id="unity-progress-bar-full" style="width: 100%"></div>
+			</div>
+			<div class="spinner-right">
+				<img
+					src="https://codehs.com/uploads/fc32d84f4cf713409d4567e4598f00aa"
+				/>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	html {
+		box-sizing: border-box;
+	}
+	*,
+	*:before,
+	*:after {
+		box-sizing: inherit;
+	}
+	html,
+	body {
+		height: 100%;
+	}
+	canvas {
+		display: block;
+	}
+	body {
+		margin: 0;
+	}
+	#unity-container {
+		width: 100%;
+		height: 100%;
+		position: relative;
+	}
+	#unity-canvas {
+		width: 100%;
+		height: 100%;
+		background: #404040;
+	}
+	#loading-cover {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	#unity-loading-bar {
+		flex: 1 1 auto;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+	.progress-spinner-container {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		width: 40%;
+	}
+	.spinner-left,
+	.spinner-right {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 40px;
+		height: 40px;
+	}
+	.spinner-left {
+		left: -50px;
+	}
+	.spinner-right {
+		right: -50px;
+	}
+	.spinner-left img,
+	.spinner-right img {
+		width: 100%;
+		height: 100%;
+		animation: rotateSpinner 1s linear infinite;
+	}
+	@keyframes rotateSpinner {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+	#unity-logo {
+		text-align: center;
+	}
+	#unity-logo img {
+		max-width: 80%;
+		max-height: 80%;
+	}
+	#unity-progress-bar-empty {
+		width: 100%;
+		height: 24px;
+		background: gray;
+		padding: 2px;
+		border-radius: 12px;
+	}
+	#unity-progress-bar-full {
+		width: 0%;
+		height: 100%;
+		background: #e5e5e5;
+		border-radius: 10px;
+	}
+	.light #unity-progress-bar-empty {
+		border-color: #000;
+	}
+	.light #unity-progress-bar-full {
+		background: #000;
+	}
+</style>
+<script>
+	const buildUrl =
+		"https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/Build";
+	const loaderUrl = buildUrl + "/v111.loader.js";
+	const config = {
+		dataUrl: buildUrl + "/6697b6deba8b617c67b69c55dcd07cb1.data.unityweb",
+		frameworkUrl: buildUrl + "/0be3c3ee7115b26e1ae28e643afdf1f2.js.unityweb",
+		codeUrl: buildUrl + "/b3397c29f6878557c1c614cbf9e196ea.wasm.unityweb",
+		streamingAssetsUrl: "StreamingAssets",
+		companyName: "Ericetto",
+		productName: "Ragdoll Archers",
+		productVersion: "0.1",
+	};
+
+	const container = document.querySelector("#unity-container");
+	const canvas = document.querySelector("#unity-canvas");
+	const loadingCover = document.querySelector("#loading-cover");
+	const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
+	const progressBarFull = document.querySelector("#unity-progress-bar-full");
+
+	let isAdShown = false;
+
+	function showAdOnClick() {
+		if (
+			!isAdShown &&
+			typeof sdk !== "undefined" &&
+			typeof sdk.showBanner !== "undefined"
+		) {
+			sdk.showBanner();
+			isAdShown = true;
+			console.log("Reklam çağrıldı.");
+		} else {
+			console.warn("SDK veya showBanner tanımlı değil.");
+		}
+	}
+
+	if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+		container.className = "unity-mobile";
+	}
+
+	loadingCover.style.display = "";
+
+	const unityLoader = document.createElement("script");
+	unityLoader.src = loaderUrl;
+	unityLoader.onload = () => {
+		createUnityInstance(canvas, config, (progress) => {
+			progressBarEmpty.style.display = "";
+			progressBarFull.style.width = `${100 * progress}%`;
+		})
+			.then((unityInstance) => {
+				window.unityInstance = unityInstance;
+				loadingCover.style.display = "none";
+				// Oyun yüklendiğinde tıklama olayını ekle
+				canvas.addEventListener("pointerdown", showAdOnClick);
+				canvas.addEventListener("touchstart", showAdOnClick);
+			})
+			.catch((message) => {
+				alert(message);
+			});
+	};
+	document.body.appendChild(unityLoader);
+
+	document.addEventListener("pointerdown", () => {
+		container.focus();
+		window.focus();
+		canvas.focus();
+	});
+</script>

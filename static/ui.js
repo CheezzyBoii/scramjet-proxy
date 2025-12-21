@@ -200,43 +200,115 @@ function Config() {
      backdrop-filter: blur(3px);
     }
 
-    .buttons {
-      gap: 0.5em;
+    .config-container {
+      padding: 1rem;
+      min-width: 450px;
     }
-    .buttons button {
+
+    .config-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .config-section h4 {
+      color: #ff8c00;
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .transport-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .transport-btn {
       border: 1px solid #ff8c00;
       background-color: #1a1a1a;
-      border-radius: 0.75em;
+      border-radius: 0.5rem;
       color: #fff;
-      padding: 0.45em;
+      padding: 0.75rem;
       transition: all 0.2s ease;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
     }
-    .buttons button:hover {
-      background-color: rgba(255, 140, 0, 0.15);
+
+    .transport-btn:hover {
+      background-color: rgba(255, 140, 0, 0.2);
+      box-shadow: 0 0 12px rgba(255, 140, 0, 0.3);
+      transform: translateY(-2px);
     }
-    .input_row input {
-      background-color: rgb(18, 18, 18);
-      border: 2px solid #ff8c00;
-      border-radius: 0.75em;
+
+    .transport-btn.active {
+      background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
+      border-color: #ffa500;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+    }
+
+    .input-group label {
+      display: block;
+      color: #e0def4;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .input-group input {
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 140, 0, 0.3);
+      border-radius: 0.5rem;
       color: #fff;
       outline: none;
-      padding: 0.45em;
-      transition: border-color 0.2s ease;
+      padding: 0.75rem;
+      transition: all 0.2s ease;
+      font-family: inherit;
     }
-    .input_row input:focus {
-      border-color: #ffa500;
+
+    .input-group input:focus {
+      border-color: #ff8c00;
       box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
     }
-    .input_row {
-      margin-bottom: 0.5em;
-      margin-top: 0.5em;
+
+    .transport-display {
+      padding: 0.75rem;
+      background: rgba(255, 140, 0, 0.1);
+      border: 1px solid rgba(255, 140, 0, 0.3);
+      border-radius: 0.5rem;
+      color: #ff8c00;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
     }
-    .input_row input {
-      flex-grow: 1;
+
+    .config-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 140, 0, 0.3);
     }
-    .centered {
-      justify-content: center;
-      align-items: center;
+
+    .btn-close {
+      border: 1px solid #ff8c00;
+      background-color: #1a1a1a;
+      border-radius: 0.5rem;
+      color: #fff;
+      padding: 0.6rem 1.5rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-close:hover {
+      background-color: rgba(255, 140, 0, 0.15);
+      box-shadow: 0 0 8px rgba(255, 140, 0, 0.2);
     }
   `;
 
@@ -248,40 +320,63 @@ function Config() {
 		}, 250);
 	}
 
+	function setTransport(path, opts) {
+		connection.setTransport(path, opts);
+		store.transport = path;
+		// Update active button styling
+		const buttons = document.querySelectorAll(".transport-btn");
+		buttons.forEach((btn) => {
+			btn.classList.remove("active");
+			if (btn.dataset.transport === path) {
+				btn.classList.add("active");
+			}
+		});
+	}
+
 	return html`
-      <dialog class="cfg" style="background-color: #0d0d0d; color: white; border-radius: 8px; border: 1px solid #ff8c00;">
-        <h3 style="color: #ff8c00; margin-top: 0;">Configuration</h3>
-        <div style="align-self: end">
-          <div class=${[flex, "buttons"]}>
-            <button on:click=${() => {
-							connection.setTransport("/baremod/index.mjs", []);
-							store.transport = "/baremod/index.mjs";
-						}}>use bare server 3</button>
-            <button on:click=${() => {
-							connection.setTransport("/libcurl/index.mjs", [
-								{ wisp: store.wispurl },
-							]);
-							store.transport = "/libcurl/index.mjs";
-						}}>use libcurl.js</button>
-              <button on:click=${() => {
-								connection.setTransport("/epoxy/index.mjs", [
-									{ wisp: store.wispurl },
-								]);
-								store.transport = "/epoxy/index.mjs";
-							}}>use epoxy</button>
+      <dialog class="cfg" style="background-color: #0d0d0d; color: white; border-radius: 10px; border: 1px solid #ff8c00; padding: 0;">
+        <div class="config-container">
+          <h3 style="color: #ff8c00; margin-top: 0; margin-bottom: 1.5rem; font-size: 1.3rem;">Connection Configuration</h3>
+          
+          <div class="config-section">
+            <h4>Transport Protocol</h4>
+            <div class="transport-buttons">
+              <button class="transport-btn ${use(store.transport) === "/baremod/index.mjs" ? "active" : ""}" 
+                      data-transport="/baremod/index.mjs"
+                      on:click=${() => setTransport("/baremod/index.mjs", [])}>
+                Bare Server 3
+              </button>
+              <button class="transport-btn ${use(store.transport) === "/libcurl/index.mjs" ? "active" : ""}"
+                      data-transport="/libcurl/index.mjs"
+                      on:click=${() => setTransport("/libcurl/index.mjs", [{ wisp: store.wispurl }])}>
+                libcurl.js
+              </button>
+              <button class="transport-btn ${use(store.transport) === "/epoxy/index.mjs" ? "active" : ""}"
+                      data-transport="/epoxy/index.mjs"
+                      on:click=${() => setTransport("/epoxy/index.mjs", [{ wisp: store.wispurl }])}>
+                Epoxy
+              </button>
+            </div>
+            <div class="transport-display">
+              Current: ${use(store.transport)}
+            </div>
           </div>
-        </div>
-        <div class=${[flex, col, "input_row"]}>
-          <label for="wisp_url_input">Wisp URL:</label>
-          <input id="wisp_url_input" bind:value=${use(store.wispurl)} spellcheck="false"></input>
-        </div>
-        <div class=${[flex, col, "input_row"]}>
-          <label for="bare_url_input">Bare URL:</label>
-          <input id="bare_url_input" bind:value=${use(store.bareurl)} spellcheck="false"></input>
-        </div>
-        <div>${use(store.transport)}</div>
-        <div class=${[flex, "buttons", "centered"]}>
-          <button on:click=${() => handleModalClose(this.root)}>close</button>
+
+          <div class="config-section">
+            <h4>Server URLs</h4>
+            <div class="input-group">
+              <label for="wisp_url_input">Wisp Server URL</label>
+              <input id="wisp_url_input" bind:value=${use(store.wispurl)} spellcheck="false" placeholder="wss://example.com/wisp/"></input>
+            </div>
+            <div class="input-group">
+              <label for="bare_url_input">Bare Server URL</label>
+              <input id="bare_url_input" bind:value=${use(store.bareurl)} spellcheck="false" placeholder="https://example.com/bare/"></input>
+            </div>
+          </div>
+
+          <div class="config-footer">
+            <button class="btn-close" on:click=${() => handleModalClose(this.root)}>Close</button>
+          </div>
         </div>
       </dialog>
   `;
@@ -623,42 +718,3 @@ function BrowserApp() {
     </div>
     `;
 }
-window.addEventListener("load", async () => {
-	// Initialize eruda console without entry button
-	if (window.eruda) {
-		window.eruda.init();
-		window.eruda.get("entryBtn").hide();
-		window.eruditState = false;
-	}
-
-	const root = document.getElementById("app");
-	try {
-		root.replaceWith(h(BrowserApp));
-	} catch (e) {
-		root.replaceWith(document.createTextNode("" + e));
-		throw e;
-	}
-	function b64(buffer) {
-		let binary = "";
-		const bytes = new Uint8Array(buffer);
-		const len = bytes.byteLength;
-		for (let i = 0; i < len; i++) {
-			binary += String.fromCharCode(bytes[i]);
-		}
-
-		return btoa(binary);
-	}
-	const arraybuffer = await (await fetch("/assets/scramjet.png")).arrayBuffer();
-	console.log(
-		"%cb",
-		`
-      background-image: url(data:image/png;base64,${b64(arraybuffer)});
-      color: transparent;
-      padding-left: 200px;
-      padding-bottom: 100px;
-      background-size: contain;
-      background-position: center center;
-      background-repeat: no-repeat;
-  `
-	);
-});

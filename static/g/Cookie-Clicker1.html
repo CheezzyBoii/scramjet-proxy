@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Insert jsDelivr HTML</title>
+	</head>
+	<body>
+		<div id="container"></div>
+
+		<script>
+			const htmlUrl =
+				"https://cdn.jsdelivr.net/gh/Gams-Offline/Gams@b75cc91c639e612c04db7d0966eb0fe6d39badf9/g/codeeditor.html";
+
+			fetch(htmlUrl)
+				.then((res) => res.text())
+				.then((html) => {
+					const container = document.getElementById("container");
+					container.innerHTML = html;
+
+					// re-run scripts
+					container.querySelectorAll("script").forEach((s) => {
+						const n = document.createElement("script");
+						if (s.src) n.src = s.src;
+						else n.textContent = s.textContent;
+						s.replaceWith(n);
+					});
+				});
+		</script>
+	</body>
+</html>

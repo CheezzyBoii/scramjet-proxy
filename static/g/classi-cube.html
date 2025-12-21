@@ -1,0 +1,106 @@
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			html,
+			body {
+				height: 100%;
+				width: 100%;
+				margin: 0px;
+			}
+			body {
+				background: #111
+					url(https://cdn.jsdelivr.net/gh/nurimoores/clawapps@c256f90f297143497e6f61dba4571701658e07a1/classic/bg_main.png);
+			}
+			canvas {
+				height: 100vh;
+				width: 100vw;
+				background: #000;
+				display: block;
+				box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+				border-radius: 4px;
+				margin: auto;
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+			}
+			span {
+				font: Bold 18px Calibri;
+				color: #f67;
+				text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+				position: absolute;
+				left: 10px;
+				bottom: 10px;
+			}
+			@media only screen and (min-width: 1078px) {
+				canvas {
+					width: 100vw;
+					height: 100vh;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<script
+			async
+			src="https://cdn.jsdelivr.net/gh/nurimoores/clawapps@c256f90f297143497e6f61dba4571701658e07a1/classic/uinitwasm.js"
+		></script>
+		<script>
+			var add_ele = (node_name, parent, attributes) =>
+					Object.assign(
+						parent.appendChild(document.createElement(node_name)),
+						attributes
+					),
+				canvas = add_ele("canvas", document.body, { width: 1300, height: 740 }),
+				log = add_ele("span", document.body, {});
+			canvas.focus();
+			canvas.addEventListener("webglcontextlost", (event) => location.reload());
+			canvas.addEventListener("contentmenu", (event) => event.preventDefault());
+			canvas.addEventListener("click", () => {
+				window.focus();
+				canvas.focus();
+				window.__requestPointerLock(canvas);
+			});
+			var Module = {
+				preRun: [
+					() => {
+						addRunDependency("load-idb");
+						FS.mkdir("/classicube");
+						FS.mount(IDBFS, {}, "/classicube");
+						FS.syncfs(true, (err) => {
+							assert(!err);
+							removeRunDependency("load-idb");
+						});
+					},
+				],
+				postRun: [],
+				arguments: ["No"],
+				print: console.log,
+				printErr: console.error,
+				canvas: canvas,
+				setStatus: (...text) => (log.innerHTML = text.join(" ")),
+				totalDependencies: 0,
+				monitorRunDependencies(left) {
+					this.totalDependencies = Math.max(this.totalDependencies, left);
+					Module.setStatus(
+						left
+							? "Preparing... (" +
+									(this.totalDependencies - left) +
+									"/" +
+									this.totalDependencies +
+									")"
+							: "All downloads complete."
+					);
+				},
+			};
+			Module.setStatus("Downloading...");
+			window.addEventListener("error", (err) => {
+				Module.setStatus("Exception thrown, see JavaScript console");
+				Module.setStatus = (...text) =>
+					(log.innerHTML = "[post-exception status] " + text.join(" "));
+			});
+		</script>
+	</body>
+</html>

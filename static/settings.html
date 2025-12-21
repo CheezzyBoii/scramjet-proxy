@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Settings</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+				text-align: center;
+				font-family:
+					-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+					Cantarell, sans-serif;
+				background-color: #0a0a0a;
+				color: #e0def4;
+				min-height: 100vh;
+			}
+
+			.settings-container {
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 2rem;
+			}
+
+			.settings-header {
+				text-align: center;
+				margin-bottom: 3rem;
+			}
+
+			.settings-header h1 {
+				color: #ff8c00;
+				font-size: 2.5rem;
+				margin-bottom: 0.5rem;
+				text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+			}
+
+			.settings-section {
+				margin-bottom: 2.5rem;
+				padding: 2rem;
+				background: linear-gradient(135deg, #1a1a1a 0%, #151515 100%);
+				border: 2px solid rgba(255, 140, 0, 0.2);
+				border-radius: 1rem;
+				box-shadow: 0 4px 15px rgba(255, 140, 0, 0.1);
+				transition: all 0.3s ease;
+			}
+
+			.settings-section:hover {
+				border-color: rgba(255, 140, 0, 0.4);
+				box-shadow: 0 6px 20px rgba(255, 140, 0, 0.15);
+			}
+
+			.settings-section h3 {
+				color: #ffa500;
+				margin-bottom: 1.5rem;
+				font-size: 1.4rem;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+			}
+
+			.form-group {
+				margin-bottom: 1.5rem;
+				text-align: left;
+			}
+
+			.form-group label {
+				display: block;
+				margin-bottom: 0.8rem;
+				color: #e0def4;
+				font-weight: 600;
+				font-size: 1rem;
+			}
+
+			select,
+			input[type="text"],
+			input[type="checkbox"] {
+				width: 100%;
+				padding: 12px 16px;
+				background-color: #0d0d0d;
+				border: 2px solid rgba(255, 140, 0, 0.3);
+				border-radius: 0.8rem;
+				color: #e0def4;
+				font-family: inherit;
+				font-size: 1rem;
+				transition: all 0.3s ease;
+			}
+
+			input[type="checkbox"] {
+				width: auto;
+				margin-right: 0.5rem;
+				cursor: pointer;
+				accent-color: #ff8c00;
+			}
+
+			.checkbox-group {
+				display: flex;
+				align-items: center;
+				gap: 0.8rem;
+			}
+
+			.checkbox-group label {
+				margin-bottom: 0;
+			}
+
+			select:focus,
+			input[type="text"]:focus,
+			input[type="checkbox"]:focus {
+				outline: none;
+				border-color: #ff8c00;
+				box-shadow: 0 0 15px rgba(255, 140, 0, 0.4);
+				background-color: #1a1a1a;
+			}
+
+			select:hover,
+			input[type="text"]:hover,
+			input[type="checkbox"]:hover {
+				border-color: rgba(255, 140, 0, 0.5);
+			}
+
+			.preview-section {
+				margin-top: 1.5rem;
+				padding: 1.5rem;
+				background-color: rgba(255, 140, 0, 0.05);
+				border: 1px solid rgba(255, 140, 0, 0.2);
+				border-radius: 0.8rem;
+				display: flex;
+				align-items: center;
+				gap: 1.5rem;
+			}
+
+			.preview-icon {
+				width: 60px;
+				height: 60px;
+				background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
+				border-radius: 0.8rem;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				flex-shrink: 0;
+				box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);
+			}
+
+			.preview-icon img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.preview-info {
+				text-align: left;
+				flex: 1;
+			}
+
+			.preview-info h4 {
+				color: #ffa500;
+				margin-bottom: 0.3rem;
+				font-size: 1.1rem;
+			}
+
+			.preview-info p {
+				color: #999;
+				font-size: 0.9rem;
+			}
+
+			.button-group {
+				display: flex;
+				gap: 1rem;
+				justify-content: center;
+				margin-top: 2rem;
+				flex-wrap: wrap;
+			}
+
+			.settings-btn {
+				padding: 12px 30px;
+				background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
+				border: none;
+				border-radius: 0.8rem;
+				color: #fff;
+				font-size: 1rem;
+				font-weight: 700;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				font-family: inherit;
+				box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.settings-btn:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 6px 20px rgba(255, 140, 0, 0.5);
+			}
+
+			.settings-btn:active {
+				transform: translateY(-1px);
+			}
+
+			.reset-btn {
+				background: linear-gradient(135deg, #555 0%, #777 100%);
+				box-shadow: 0 4px 15px rgba(85, 85, 85, 0.3);
+			}
+
+			.reset-btn:hover {
+				box-shadow: 0 6px 20px rgba(85, 85, 85, 0.5);
+			}
+
+			.footer-text {
+				text-align: center;
+				font-size: 14px;
+				text-shadow: 1px 1px 3px #000;
+				color: #999;
+				margin-top: 3rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="settings-container">
+			<div class="settings-header">
+				<h1>⚙️ Settings</h1>
+			</div>
+
+			<!-- Preset Sites Section -->
+			<div class="settings-section">
+				<h3>🎓 Quick Site Selection</h3>
+				<div class="form-group">
+					<label for="site-select">Select an educational site:</label>
+					<select id="site-select" onchange="selectSite()">
+						<option value="">-- Choose a site --</option>
+						<option value="google">Google</option>
+						<option value="classroom">Google Classroom</option>
+						<option value="clever">Clever</option>
+						<option value="classlink">ClassLink</option>
+						<option value="mathia">MATHIA (Carnegie Learning)</option>
+						<option value="schoology">Schoology</option>
+						<option value="aspen">Aspen</option>
+					</select>
+				</div>
+			</div>
+
+			<!-- Custom Settings Section -->
+			<div class="settings-section">
+				<h3>🎯 Custom Customization</h3>
+				<div class="form-group">
+					<label for="custom-title">Custom Page Title:</label>
+					<input
+						type="text"
+						id="custom-title"
+						placeholder="Enter custom title (e.g., YouTube, Google, GitHub)"
+						onchange="updateCustom()"
+					/>
+				</div>
+				<div class="form-group">
+					<label for="custom-favicon">Favicon URL:</label>
+					<input
+						type="text"
+						id="custom-favicon"
+						placeholder="Enter favicon URL (e.g., https://example.com/icon.png)"
+						onchange="updateCustom()"
+					/>
+				</div>
+			</div>
+
+			<!-- Appearance Settings -->
+			<div class="settings-section">
+				<h3>🎨 Appearance</h3>
+				<div class="form-group">
+					<label for="theme-select">Theme:</label>
+					<select id="theme-select" onchange="applyTheme()">
+						<option value="dark">Dark Mode</option>
+						<option value="light">Light Mode</option>
+						<option value="auto">Auto (System)</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<div class="checkbox-group">
+						<input
+							type="checkbox"
+							id="animations-toggle"
+							checked
+							onchange="toggleAnimations()"
+						/>
+						<label for="animations-toggle">Enable Animations</label>
+					</div>
+				</div>
+			</div>
+
+			<!-- Performance Settings -->
+			<div class="settings-section">
+				<h3>⚡ Performance</h3>
+				<div class="form-group">
+					<div class="checkbox-group">
+						<input
+							type="checkbox"
+							id="cache-toggle"
+							checked
+							onchange="toggleCache()"
+						/>
+						<label for="cache-toggle">Enable Cache</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<button
+						class="settings-btn"
+						style="width: auto; display: inline-block"
+						onclick="clearCache()"
+					>
+						Clear Cache
+					</button>
+				</div>
+			</div>
+
+			<!-- Privacy & Security -->
+			<div class="settings-section">
+				<h3>🔒 Privacy & Security</h3>
+				<div class="form-group">
+					<div class="checkbox-group">
+						<input
+							type="checkbox"
+							id="history-toggle"
+							checked
+							onchange="toggleHistory()"
+						/>
+						<label for="history-toggle">Save Browsing History</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<button
+						class="settings-btn"
+						style="width: auto; display: inline-block"
+						onclick="clearBrowsingData()"
+					>
+						Clear All Data
+					</button>
+				</div>
+			</div>
+
+			<!-- Notifications -->
+			<div class="settings-section">
+				<h3>🔔 Notifications</h3>
+				<div class="form-group">
+					<div class="checkbox-group">
+						<input
+							type="checkbox"
+							id="notifications-toggle"
+							checked
+							onchange="toggleNotifications()"
+						/>
+						<label for="notifications-toggle">Enable Notifications</label>
+					</div>
+				</div>
+			</div>
+
+			<div class="button-group">
+				<button class="settings-btn" onclick="applySettings()">
+					Apply Settings
+				</button>
+				<button class="settings-btn reset-btn" onclick="resetSettings()">
+					Reset to Default
+				</button>
+			</div>
+
+			<p class="footer-text">©2025 Cheese Bread Proxy Settings</p>
+		</div>
+
+		<script>
+			// Educational sites presets
+			const presets = {
+				google: {
+					title: "Google",
+					favicon: "https://www.google.com/favicon.ico",
+				},
+				classroom: {
+					title: "Home",
+					favicon: "https://ssl.gstatic.com/classroom/favicon.png",
+				},
+				clever: {
+					title: "Clever | Portal",
+					favicon:
+						"https://www.clever.com/wp-content/uploads/2023/06/cropped-Favicon-512px-180x180.png",
+				},
+				classlink: {
+					title: "My Apps",
+					favicon: "https://myapps.classlink.com/favicon.ico",
+				},
+				mathia: {
+					title: "Carnegie Learning",
+					favicon: "https://mathstream.carnegielearning.com/assets/favicon.ico",
+				},
+				schoology: {
+					title: "Home | Schoology",
+					favicon:
+						"https://asset-cdn.schoology.com/sites/all/themes/schoology_theme/favicon.ico",
+				},
+				aspen: {
+					title: "Aspen: Pages",
+					favicon: "https://dodeasis.myfollett.com/aspen/images/favicon.ico",
+				},
+			};
+
+			function selectSite() {
+				const siteKey = document.getElementById("site-select").value;
+				if (!siteKey) return;
+
+				const site = presets[siteKey];
+
+				// Update custom fields
+				document.getElementById("custom-title").value = site.title;
+				document.getElementById("custom-favicon").value = site.favicon;
+				updateCustom();
+			}
+
+			function updateCustom() {
+				const title = document.getElementById("custom-title").value;
+				const favicon = document.getElementById("custom-favicon").value;
+
+				// Change title globally
+				if (title) {
+					document.title = title;
+					if (window.parent && window.parent !== window) {
+						window.parent.document.title = title;
+					}
+				}
+
+				if (favicon) {
+					// Change favicon in current window
+					let faviconLink = document.querySelector('link[rel="icon"]');
+					if (!faviconLink) {
+						faviconLink = document.createElement("link");
+						faviconLink.rel = "icon";
+						document.head.appendChild(faviconLink);
+					}
+					faviconLink.href = favicon;
+
+					// Change favicon in parent window if in iframe
+					if (window.parent && window.parent !== window) {
+						let parentFaviconLink =
+							window.parent.document.querySelector('link[rel="icon"]');
+						if (!parentFaviconLink) {
+							parentFaviconLink = window.parent.document.createElement("link");
+							parentFaviconLink.rel = "icon";
+							window.parent.document.head.appendChild(parentFaviconLink);
+						}
+						parentFaviconLink.href = favicon;
+					}
+				}
+
+				// Store settings in localStorage
+				localStorage.setItem("custom-title", title);
+				localStorage.setItem("custom-favicon", favicon);
+			}
+
+			function applyTheme() {
+				const theme = document.getElementById("theme-select").value;
+				localStorage.setItem("theme", theme);
+				// Apply theme logic here
+				if (theme === "light") {
+					document.body.style.backgroundColor = "#f5f5f5";
+					document.body.style.color = "#333";
+				} else {
+					document.body.style.backgroundColor = "#0a0a0a";
+					document.body.style.color = "#e0def4";
+				}
+			}
+
+			function toggleAnimations() {
+				const enabled = document.getElementById("animations-toggle").checked;
+				localStorage.setItem("animations", enabled);
+				const style = document.createElement("style");
+				if (!enabled) {
+					style.textContent =
+						"* { animation: none !important; transition: none !important; }";
+					document.head.appendChild(style);
+				}
+			}
+
+			function toggleCache() {
+				const enabled = document.getElementById("cache-toggle").checked;
+				localStorage.setItem("cache-enabled", enabled);
+			}
+
+			function clearCache() {
+				if (confirm("Are you sure you want to clear the cache?")) {
+					localStorage.removeItem("game-cache");
+					sessionStorage.clear();
+					alert("Cache cleared successfully!");
+				}
+			}
+
+			function toggleHistory() {
+				const enabled = document.getElementById("history-toggle").checked;
+				localStorage.setItem("history-enabled", enabled);
+			}
+
+			function clearBrowsingData() {
+				if (confirm("This will clear all your browsing data. Are you sure?")) {
+					localStorage.clear();
+					sessionStorage.clear();
+					alert("All data cleared successfully!");
+					location.reload();
+				}
+			}
+
+			function toggleNotifications() {
+				const enabled = document.getElementById("notifications-toggle").checked;
+				localStorage.setItem("notifications-enabled", enabled);
+			}
+
+			function resetSettings() {
+				if (
+					confirm("Are you sure you want to reset all settings to default?")
+				) {
+					document.getElementById("site-select").value = "";
+					document.getElementById("custom-title").value = "";
+					document.getElementById("custom-favicon").value = "";
+					document.getElementById("theme-select").value = "dark";
+					document.getElementById("animations-toggle").checked = true;
+					document.getElementById("cache-toggle").checked = true;
+					document.getElementById("history-toggle").checked = true;
+					document.getElementById("notifications-toggle").checked = true;
+
+					localStorage.clear();
+					alert("All settings have been reset!");
+					location.reload();
+				}
+			}
+
+			// Load settings from localStorage on page load
+			window.addEventListener("DOMContentLoaded", () => {
+				const savedTitle = localStorage.getItem("custom-title");
+				const savedFavicon = localStorage.getItem("custom-favicon");
+				const savedTheme = localStorage.getItem("theme") || "dark";
+				const animationsEnabled =
+					localStorage.getItem("animations") !== "false";
+				const cacheEnabled = localStorage.getItem("cache-enabled") !== "false";
+				const historyEnabled =
+					localStorage.getItem("history-enabled") !== "false";
+				const notificationsEnabled =
+					localStorage.getItem("notifications-enabled") !== "false";
+
+				if (savedTitle)
+					document.getElementById("custom-title").value = savedTitle;
+				if (savedFavicon)
+					document.getElementById("custom-favicon").value = savedFavicon;
+
+				document.getElementById("theme-select").value = savedTheme;
+				document.getElementById("animations-toggle").checked =
+					animationsEnabled;
+				document.getElementById("cache-toggle").checked = cacheEnabled;
+				document.getElementById("history-toggle").checked = historyEnabled;
+				document.getElementById("notifications-toggle").checked =
+					notificationsEnabled;
+			});
+		</script>
+	</body>
+</html>

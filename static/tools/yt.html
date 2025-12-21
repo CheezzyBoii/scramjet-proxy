@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>YouTube Unblocker</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			:root {
+				--background: hsl(0, 0%, 6%);
+				--foreground: hsl(0, 0%, 95%);
+				--card: hsl(0, 0%, 13%);
+				--card-foreground: hsl(0, 0%, 95%);
+				--primary: hsl(0, 100%, 50%);
+				--primary-foreground: hsl(0, 0%, 100%);
+				--secondary: hsl(0, 0%, 19%);
+				--secondary-foreground: hsl(0, 0%, 95%);
+				--muted: hsl(0, 0%, 19%);
+				--muted-foreground: hsl(0, 0%, 67%);
+				--border: hsl(0, 0%, 19%);
+				--input: hsl(0, 0%, 13%);
+				--destructive: hsl(0, 84%, 60%);
+				--radius: 0.5rem;
+				--youtube-red: hsl(0, 100%, 50%);
+			}
+			body {
+				font-family: "Roboto", sans-serif;
+				background-color: var(--background);
+				color: var(--foreground);
+				min-height: 100vh;
+			} /* Header Styles */
+			.header {
+				background-color: var(--background);
+				border-bottom: 1px solid var(--border);
+				padding: 12px 16px;
+				position: sticky;
+				top: 0;
+				z-index: 50;
+			}
+			.header-content {
+				max-width: 1280px;
+				margin: 0 auto;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			.logo-section {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+			}
+			.menu-btn {
+				background: none;
+				border: none;
+				color: var(--foreground);
+				padding: 8px;
+				border-radius: 50%;
+				cursor: pointer;
+				transition: background-color 0.2s;
+			}
+			.menu-btn:hover {
+				background-color: var(--secondary);
+			}
+			.logo {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+			.youtube-logo {
+				color: var(--youtube-red);
+				width: 24px;
+				height: 24px;
+			}
+			.logo-text {
+				font-size: 20px;
+				font-weight: 500;
+			}
+			.logo-subtitle {
+				font-size: 14px;
+				color: var(--muted-foreground);
+				margin-left: 4px;
+			} /* Search Bar Styles */
+			.search-container {
+				flex: 1;
+				max-width: 512px;
+				margin: 0 32px;
+			}
+			.search-form {
+				display: flex;
+			}
+			.search-input {
+				flex: 1;
+				padding: 8px 16px;
+				background-color: var(--input);
+				border: 1px solid var(--border);
+				border-radius: 9999px 0 0 9999px;
+				color: var(--foreground);
+				font-size: 16px;
+				outline: none;
+			}
+			.search-input::placeholder {
+				color: var(--muted-foreground);
+			}
+			.search-input:focus {
+				border-color: var(--primary);
+				box-shadow: 0 0 0 1px var(--primary);
+			}
+			.search-btn {
+				padding: 8px 24px;
+				background-color: var(--secondary);
+				border: 1px solid var(--border);
+				border-left: none;
+				border-radius: 0 9999px 9999px 0;
+				color: var(--foreground);
+				cursor: pointer;
+				transition: background-color 0.2s;
+			}
+			.search-btn:hover {
+				background-color: var(--muted);
+			} /* User Menu */
+			.user-menu {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.icon-btn {
+				background: none;
+				border: none;
+				color: var(--foreground);
+				padding: 8px;
+				border-radius: 50%;
+				cursor: pointer;
+				transition: background-color 0.2s;
+			}
+			.icon-btn:hover {
+				background-color: var(--secondary);
+			}
+			.user-avatar {
+				width: 32px;
+				height: 32px;
+				background-color: var(--primary);
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: white;
+			} /* Main Content */
+			.main-content {
+				max-width: 1280px;
+				margin: 0 auto;
+				padding: 24px 16px;
+			}
+			.content-grid {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 24px;
+			}
+			@media (min-width: 1024px) {
+				.content-grid {
+					grid-template-columns: 2fr 1fr;
+				}
+			} /* Cards */
+			.card {
+				background-color: var(--card);
+				border-radius: var(--radius);
+				padding: 24px;
+				margin-bottom: 24px;
+			}
+			.card-sm {
+				background-color: var(--card);
+				border-radius: var(--radius);
+				padding: 16px;
+				margin-bottom: 24px;
+			} /* Error Message */
+			.error {
+				background-color: rgba(239, 68, 68, 0.1);
+				border: 1px solid rgba(239, 68, 68, 0.2);
+				border-radius: var(--radius);
+				padding: 16px;
+				margin-bottom: 24px;
+				display: none;
+			}
+			.error.show {
+				display: block;
+				animation: fadeIn 0.3s ease-in;
+			}
+			.error-content {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+			.error-icon {
+				color: var(--destructive);
+				width: 20px;
+				height: 20px;
+			}
+			.error-text {
+				color: var(--destructive);
+				font-weight: 500;
+			} /* Video Player */
+			.video-player {
+				display: none;
+				margin-bottom: 24px;
+				animation: fadeIn 0.3s ease-in;
+			}
+			.video-player.show {
+				display: block;
+			}
+			.video-iframe {
+				width: 100%;
+				height: 400px;
+				border: none;
+				border-radius: var(--radius);
+			}
+			.video-info {
+				padding: 16px;
+				background-color: var(--card);
+				border-radius: 0 0 var(--radius) var(--radius);
+			}
+			.video-title {
+				font-size: 20px;
+				font-weight: 600;
+				margin-bottom: 8px;
+			}
+			.video-meta {
+				display: flex;
+				gap: 16px;
+				color: var(--muted-foreground);
+				font-size: 14px;
+			} /* Instructions */
+			.instructions {
+				text-align: center;
+			}
+			.instructions.hide {
+				display: none;
+			}
+			.instructions-icon {
+				width: 64px;
+				height: 64px;
+				background-color: var(--primary);
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin: 0 auto 16px;
+			}
+			.instructions-title {
+				font-size: 24px;
+				font-weight: 700;
+				margin-bottom: 8px;
+			}
+			.instructions-subtitle {
+				color: var(--muted-foreground);
+				margin-bottom: 24px;
+			}
+			.steps {
+				background-color: var(--secondary);
+				border-radius: var(--radius);
+				padding: 16px;
+				margin-bottom: 24px;
+				text-align: left;
+			}
+			.steps-title {
+				font-weight: 600;
+				margin-bottom: 12px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+			}
+			.step {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				margin-bottom: 8px;
+				font-size: 14px;
+				color: var(--muted-foreground);
+			}
+			.step-number {
+				width: 24px;
+				height: 24px;
+				background-color: var(--primary);
+				color: white;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 12px;
+				flex-shrink: 0;
+			} /* Recent Videos */
+			.recent-videos {
+				background-color: var(--card);
+				border-radius: var(--radius);
+				padding: 16px;
+			}
+			.recent-title {
+				font-weight: 600;
+				margin-bottom: 16px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.recent-title-icon {
+				color: var(--primary);
+				width: 20px;
+				height: 20px;
+			}
+			.recent-list {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
+			.recent-item {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 8px;
+				border-radius: var(--radius);
+				cursor: pointer;
+				transition: all 0.2s;
+			}
+			.recent-item:hover {
+				background-color: var(--secondary);
+				transform: scale(1.02);
+			}
+			.recent-thumbnail {
+				width: 64px;
+				height: 36px;
+				background-color: var(--muted);
+				border-radius: 4px;
+				overflow: hidden;
+				flex-shrink: 0;
+			}
+			.recent-thumbnail img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+			.recent-info {
+				flex: 1;
+				min-width: 0;
+			}
+			.recent-video-title {
+				font-size: 14px;
+				font-weight: 500;
+				margin-bottom: 2px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.recent-date {
+				font-size: 12px;
+				color: var(--muted-foreground);
+			}
+			.no-recent {
+				text-align: center;
+				color: var(--muted-foreground);
+				padding: 32px 0;
+			}
+			.no-recent-icon {
+				width: 32px;
+				height: 32px;
+				margin: 0 auto 8px;
+			} /* Animations */
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+			@keyframes spin {
+				from {
+					transform: rotate(0deg);
+				}
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			.loading-spinner {
+				animation: spin 1s linear infinite;
+			} /* Icons */
+			.icon {
+				width: 20px;
+				height: 20px;
+				fill: currentColor;
+			}
+			:root {
+				--youtube-red: hsl(0, 100%, 50%);
+				--radius: 0.5rem;
+			}
+			body {
+				font-family: "Roboto", sans-serif;
+				background-color: hsl(0, 0%, 6%);
+				color: hsl(0, 0%, 95%);
+			}
+			.clear-history-btn {
+				background-color: hsl(0, 84%, 60%);
+				color: white;
+				border: none;
+				border-radius: var(--radius);
+				padding: 8px 12px;
+				margin-top: 10px;
+				cursor: pointer;
+				width: 100%;
+				transition: background-color 0.2s;
+			}
+			.clear-history-btn:hover {
+				background-color: hsl(0, 84%, 50%);
+			}
+			.recent-video-title {
+				max-width: 250px;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+			.download-btn {
+				margin-top: 12px;
+				width: 100%;
+				background-color: var(--youtube-red);
+				color: white;
+				padding: 10px;
+				border: none;
+				border-radius: var(--radius);
+				cursor: pointer;
+				font-size: 16px;
+				transition: background-color 0.2s;
+			}
+			.download-btn:hover {
+				background-color: hsl(0, 100%, 40%);
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class="header-content">
+				<div class="logo-section">
+					<div class="logo">
+						<svg class="youtube-logo" viewBox="0 0 24 24" fill="currentColor">
+							<path
+								d="M23.498 6.186a2.854 2.854 0 0 0-2.008-2.023C19.61 3.814 12 3.814 12 3.814s-7.61 0-9.49.349A2.854 2.854 0 0 0 .502 6.186C.152 8.08.152 12.022.152 12.022s0 3.943.35 5.836a2.854 2.854 0 0 0 2.008 2.023c1.88.349 9.49.349 9.49.349s7.61 0 9.49-.349a2.854 2.854 0 0 0 2.008-2.023c.35-1.893.35-5.836.35-5.836s0-3.942-.35-5.836zM9.818 15.592V8.451l6.327 3.571-6.327 3.57z"
+							/>
+						</svg>
+						<span class="logo-text">YouTube</span>
+						<span class="logo-subtitle">Unblocker</span>
+					</div>
+				</div>
+				<center>
+					<div class="search-container">
+						<form class="search-form" id="searchForm">
+							<input
+								type="text"
+								class="search-input"
+								id="searchInput"
+								placeholder="Paste YouTube URL..."
+							/>
+							<button type="submit" class="search-btn"></button>
+						</form>
+					</div>
+				</center>
+			</div>
+		</header>
+
+		<main class="main-content">
+			<div class="content-grid">
+				<div>
+					<div id="errorMessage" class="error">
+						<div class="error-content">
+							<svg
+								class="error-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+							>
+								<path
+									d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+								/>
+								<line x1="12" x2="12" y1="9" y2="13" />
+								<line x1="12" x2="12.01" y1="17" y2="17" />
+							</svg>
+							<div>
+								<div class="error-text">Error</div>
+								<div id="errorText"></div>
+							</div>
+						</div>
+					</div>
+
+					<div id="videoPlayer" class="video-player">
+						<div class="card" style="padding: 0">
+							<iframe
+								id="videoIframe"
+								class="video-iframe"
+								allowfullscreen
+								allow="autoplay; encrypted-media"
+							></iframe>
+							<div class="video-info">
+								<h2 class="video-title" id="videoTitle">Video Loading...</h2>
+								<div class="video-meta">
+									<span>Video loaded</span><span>Just now</span>
+								</div>
+								<button id="downloadBtn" class="download-btn">
+									Download Video
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<div id="instructions" class="card instructions">
+						<div class="instructions-icon">
+							<svg
+								style="color: white; width: 32px; height: 32px"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+							>
+								<path
+									d="M23.498 6.186a2.854 2.854 0 0 0-2.008-2.023C19.61 3.814 12 3.814 12 3.814s-7.61 0-9.49.349A2.854 2.854 0 0 0 .502 6.186C.152 8.08.152 12.022.152 12.022s0 3.943.35 5.836a2.854 2.854 0 0 0 2.008 2.023c1.88.349 9.49.349 9.49.349s7.61 0 9.49-.349a2.854 2.854 0 0 0 2.008-2.023c.35-1.893.35-5.836.35-5.836s0-3.942-.35-5.836zM9.818 15.592V8.451l6.327 3.571-6.327 3.57z"
+								/>
+							</svg>
+						</div>
+						<h1 class="instructions-title">YouTube URL Converter</h1>
+						<p class="instructions-subtitle">
+							Paste any YouTube video URL above to convert and play it safely.
+						</p>
+					</div>
+				</div>
+
+				<div>
+					<div class="recent-videos">
+						<h3 class="recent-title">
+							<svg
+								class="recent-title-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+							>
+								<circle cx="12" cy="12" r="10" />
+								<polyline points="12,6 12,12 16,14" />
+							</svg>
+							Recently Viewed
+						</h3>
+						<div id="recentVideosList" class="recent-list">
+							<div class="no-recent">
+								<svg
+									class="no-recent-icon"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<circle cx="12" cy="12" r="10" />
+									<polyline points="12,6 12,12 16,14" />
+								</svg>
+								<p>No recent videos</p>
+							</div>
+						</div>
+						<button class="clear-history-btn" onclick="clearHistory()">
+							Clear History
+						</button>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<script>
+			function extractVideoId(input) {
+				if (!input) return null;
+
+				// If user enters only the ID (11-char)
+				if (/^[a-zA-Z0-9_-]{11}$/.test(input)) {
+					return input;
+				}
+
+				// Add protocol if missing
+				let urlStr = input.trim();
+				if (!/^https?:\/\//i.test(urlStr)) {
+					urlStr = "https://" + urlStr;
+				}
+
+				let url;
+				try {
+					url = new URL(urlStr);
+				} catch (e) {
+					return null;
+				}
+
+				const hostname = url.hostname.replace("www.", "");
+
+				// 1. watch?v=ID
+				if (url.searchParams.has("v")) {
+					return url.searchParams.get("v");
+				}
+
+				// 2. youtu.be/ID
+				if (hostname === "youtu.be") {
+					return url.pathname.split("/")[1] || null;
+				}
+
+				// 3. youtube.com/embed/ID
+				const embedMatch = url.pathname.match(/^\/embed\/([a-zA-Z0-9_-]{11})/);
+				if (embedMatch) return embedMatch[1];
+
+				// 4. youtube.com/v/ID
+				const vMatch = url.pathname.match(/^\/v\/([a-zA-Z0-9_-]{11})/);
+				if (vMatch) return vMatch[1];
+
+				// 5. youtube.com/shorts/ID
+				const shortsMatch = url.pathname.match(
+					/^\/shorts\/([a-zA-Z0-9_-]{11})/
+				);
+				if (shortsMatch) return shortsMatch[1];
+
+				// 6. youtube.com/live/ID
+				const liveMatch = url.pathname.match(/^\/live\/([a-zA-Z0-9_-]{11})/);
+				if (liveMatch) return liveMatch[1];
+
+				// 7. handle weird extra path formats
+				const pathParts = url.pathname.split("/");
+				for (let part of pathParts) {
+					if (/^[a-zA-Z0-9_-]{11}$/.test(part)) {
+						return part;
+					}
+				}
+
+				return null;
+			}
+
+			function generateEmbedUrl(videoId) {
+				return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+			}
+			function truncate(str, len = 60) {
+				return str.length > len ? str.slice(0, len - 3) + "..." : str;
+			}
+			async function fetchVideoTitle(videoId) {
+				try {
+					const url = `https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`;
+					const res = await fetch(url);
+					if (!res.ok) throw new Error("noembed failed");
+					const data = await res.json();
+					return truncate(data.title || `Video ${videoId}`);
+				} catch (err) {
+					console.warn("Title fetch failed:", err);
+					return `Video ${videoId}`;
+				}
+			}
+
+			function getRecentVideos() {
+				try {
+					return JSON.parse(localStorage.getItem("recentVideos") || "[]");
+				} catch {
+					return [];
+				}
+			}
+			function saveRecentVideos(videos) {
+				localStorage.setItem("recentVideos", JSON.stringify(videos));
+			}
+			async function addToRecentVideos(videoId, title = "") {
+				// if title not provided, fetch it
+				const finalTitle = title || (await fetchVideoTitle(videoId));
+				const video = {
+					id: videoId,
+					title: finalTitle,
+					timestamp: new Date().toISOString(),
+					thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+				};
+				let list = getRecentVideos().filter((v) => v.id !== videoId);
+				list.unshift(video);
+				saveRecentVideos(list.slice(0, 5));
+				renderRecentVideos();
+			}
+
+			function clearHistory() {
+				localStorage.removeItem("recentVideos");
+				renderRecentVideos();
+			}
+			function showError(msg) {
+				document.getElementById("errorText").textContent = msg;
+				document.getElementById("errorMessage").classList.add("show");
+				setTimeout(
+					() =>
+						document.getElementById("errorMessage").classList.remove("show"),
+					5000
+				);
+			}
+			async function showVideo(videoId) {
+				const videoPlayer = document.getElementById("videoPlayer");
+				const videoIframe = document.getElementById("videoIframe");
+				const videoTitle = document.getElementById("videoTitle");
+				const instructions = document.getElementById("instructions");
+
+				// set iframe
+				videoIframe.src = generateEmbedUrl(videoId);
+
+				// get title once (with fallback)
+				const title = await fetchVideoTitle(videoId);
+				videoTitle.textContent = title;
+
+				// save to recent (uses the title we fetched)
+				addToRecentVideos(videoId, title);
+
+				videoPlayer.classList.add("show");
+				instructions.classList.add("hide");
+
+				// download function
+				updateDownloadButton(videoId);
+			}
+
+			function renderRecentVideos() {
+				const container = document.getElementById("recentVideosList");
+				const videos = getRecentVideos();
+				if (!videos.length) {
+					container.innerHTML = `<div class="no-recent"><p>No recent videos</p></div>`;
+					return;
+				}
+				container.innerHTML = videos
+					.map(
+						(v) => `
+    <div class="recent-item" onclick="showVideo('${v.id}')">
+      <div class="recent-thumbnail"><img src="${v.thumbnail}"></div>
+      <div class="recent-info">
+        <div class="recent-video-title">${v.title}</div>
+        <div class="recent-date">${new Date(v.timestamp).toLocaleDateString()}</div>
+      </div>
+    </div>
+  `
+					)
+					.join("");
+			}
+			document.getElementById("searchForm").addEventListener("submit", (e) => {
+				e.preventDefault();
+				const input = document.getElementById("searchInput");
+				const url = input.value.trim();
+				if (!url) return showError("Please enter a YouTube URL");
+				const videoId = extractVideoId(url);
+				if (!videoId) return showError("Invalid YouTube URL");
+				// showVideo will fetch the title and save it
+				showVideo(videoId);
+				input.value = "";
+			});
+			document.addEventListener("DOMContentLoaded", renderRecentVideos);
+
+			async function updateDownloadButton(videoId) {
+				const btn = document.getElementById("downloadBtn");
+				if (!btn) return;
+
+				const apiUrl = `https://youtube-media-downloader.p.rapidapi.com/v2/video/details?videoId=${videoId}&urlAccess=normal&videos=auto&audios=auto`;
+
+				try {
+					const res = await fetch(apiUrl, {
+						method: "GET",
+						headers: {
+							"x-rapidapi-key":
+								"49f9ca67b0mshdf78a03eb9f6d5fp1f0528jsn2d90bcceea5f",
+							"x-rapidapi-host": "youtube-media-downloader.p.rapidapi.com",
+						},
+					});
+
+					const data = await res.json();
+					console.log("Full API response:", data); // ✅ Debugging
+
+					const videos = data?.videos?.items; // Optional chaining
+
+					if (!Array.isArray(videos) || videos.length === 0) {
+						btn.disabled = true;
+						btn.textContent = "No video downloads available";
+						return;
+					}
+
+					// Try 1080p first
+					let videoFile = videos.find((v) => v.quality === "1080p");
+
+					// Fallback: highest available resolution
+					if (!videoFile) {
+						videoFile = videos.sort(
+							(a, b) => (b.height || 0) - (a.height || 0)
+						)[0];
+					}
+
+					btn.disabled = false;
+					btn.textContent = `Download ${videoFile.quality || "video"}`;
+
+					// Clicking the button opens the download link
+					btn.onclick = () => {
+						const a = document.createElement("a");
+						a.href = videoFile.url;
+						a.target = "_blank"; // opens in a new tab
+						a.download = `video_${videoId}.${videoFile.extension}`; // optional: forces download
+						document.body.appendChild(a);
+						a.click();
+						document.body.removeChild(a);
+					};
+				} catch (err) {
+					console.error("Download error:", err);
+					btn.disabled = true;
+					btn.textContent = "Error loading download";
+				}
+			}
+		</script>
+		<script
+			defer
+			src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+			integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
+			data-cf-beacon='{"version":"2024.11.0","token":"e48c0f2908434acfb355dd194193b947","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+			crossorigin="anonymous"
+		></script>
+	</body>
+</html>

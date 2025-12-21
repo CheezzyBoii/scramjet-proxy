@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Ruffle SWF Player</title>
+		<script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.2.0-nightly.2025.10.22/ruffle.min.js"></script>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			body {
+				margin: 0;
+				font-family: "Orbitron", sans-serif;
+				background: linear-gradient(135deg, #1f2937, #3b82f6);
+				color: #ffcc70;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				overflow: hidden;
+			}
+
+			#ui-container {
+				background: rgba(255, 255, 255, 0.08);
+				border-radius: 20px;
+				backdrop-filter: blur(10px);
+				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+				padding: 40px 30px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 20px;
+				text-align: center;
+			}
+
+			h1 img {
+				height: 60px;
+				transition: transform 0.3s ease;
+			}
+
+			h1 img:hover {
+				transform: rotate(5deg) scale(1.1);
+				filter: drop-shadow(0 0 10px #ffd700);
+			}
+
+			input[type="file"] {
+				display: none;
+			}
+
+			button,
+			select {
+				background: #ffcc70;
+				color: #1f2937;
+				border: none;
+				padding: 14px 24px;
+				border-radius: 10px;
+				font-size: 16px;
+				font-weight: bold;
+				cursor: pointer;
+				transition: 0.3s ease;
+				width: 260px;
+			}
+
+			button:hover,
+			select:hover {
+				background-color: #ffc34d;
+				transform: scale(1.05);
+			}
+
+			#player-container {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+				background: black;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				visibility: hidden;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			@media (max-width: 600px) {
+				#ui-container {
+					width: 90%;
+					padding: 20px;
+				}
+
+				button,
+				select {
+					width: 100%;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="ui-container">
+			<h1>
+				<a href="https://ruffle.rs" target="_blank">
+					<img src="logo.svg" alt="Ruffle Logo" />
+				</a>
+			</h1>
+
+			<button id="choose-file-btn">Play From File</button>
+			<input type="file" id="file-input" accept=".swf" />
+
+			<button id="start-button">Start</button>
+		</div>
+
+		<div id="player-container"></div>
+
+		<script>
+			const fileInput = document.getElementById("file-input");
+			const startButton = document.getElementById("start-button");
+			const chooseFileBtn = document.getElementById("choose-file-btn");
+			const folderSelect = document.getElementById("folder-file-select");
+			const playerContainer = document.getElementById("player-container");
+			const uiContainer = document.getElementById("ui-container");
+			const body = document.body;
+
+			let selectedFile = null;
+			let selectedFolderFile = null;
+			let fromFolder = false;
+
+			const ruffle = window.RufflePlayer.newest();
+			const player = ruffle.createPlayer();
+
+			// Handle local file upload
+			chooseFileBtn.addEventListener("click", () => {
+				fileInput.click();
+			});
+
+			fileInput.addEventListener("change", (event) => {
+				selectedFile = event.target.files[0];
+				fromFolder = false;
+				folderSelect.value = "";
+			});
+
+			folderSelect.addEventListener("change", () => {
+				selectedFolderFile = folderSelect.value;
+				selectedFile = null;
+				fromFolder = true;
+			});
+
+			startButton.addEventListener("click", () => {
+				if (fromFolder && selectedFolderFile) {
+					loadAndPlaySWF(`swf-files/${selectedFolderFile}`);
+				} else if (!fromFolder && selectedFile) {
+					const fileUrl = URL.createObjectURL(selectedFile);
+					loadAndPlaySWF(fileUrl);
+				} else {
+					startButton.textContent = "Select a File";
+					setTimeout(() => (startButton.textContent = "Start"), 1000);
+				}
+			});
+
+			function loadAndPlaySWF(src) {
+				playerContainer.innerHTML = "";
+				const embed = document.createElement("embed");
+				embed.setAttribute("type", "application/x-shockwave-flash");
+				embed.style.width = "100vw";
+				embed.style.height = "100vh";
+				embed.style.border = "none";
+				embed.src = src;
+				playerContainer.appendChild(embed);
+
+				playerContainer.style.visibility = "visible";
+				uiContainer.classList.add("hidden");
+				document.body.style.backgroundColor = "black";
+			}
+
+			// Load SWF list from JSON
+			async function loadSWFList() {
+				try {
+					const response = await fetch(
+						"ruffle-swf-player/swf-files/index.json"
+					);
+					const games = await response.json();
+
+					if (!Array.isArray(games) || games.length === 0) {
+						folderSelect.innerHTML = "<option>No games available</option>";
+						return;
+					}
+
+					folderSelect.innerHTML = '<option value="">Select a game</option>';
+					games.forEach((game) => {
+						const option = document.createElement("option");
+						option.value = game.file;
+						option.textContent = game.name;
+						folderSelect.appendChild(option);
+					});
+				} catch (err) {
+					console.error("Failed to load SWF list:", err);
+					folderSelect.innerHTML = "<option>Error loading list</option>";
+				}
+			}
+
+			loadSWFList();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>google.com</title>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/gh/schoolflashx/bilbilu@main/TemplateData/css/style.css"
+		/>
+		<style>
+			/* Make container and canvas fill the viewport */
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			#gameContainer {
+				position: relative;
+				width: 100%;
+				height: 100%;
+			}
+			canvas {
+				display: block;
+				width: 100% !important;
+				height: 100% !important;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="gameContainer" class="unity-desktop webgl-content">
+			<canvas id="gameCanvas"></canvas>
+		</div>
+
+		<script>
+			function hasWebGL() {
+				try {
+					var canvas = document.createElement("canvas");
+					return (
+						!!window.WebGLRenderingContext &&
+						(canvas.getContext("webgl") ||
+							canvas.getContext("experimental-webgl"))
+					);
+				} catch (e) {
+					return false;
+				}
+			}
+
+			function CheckCompatibility() {
+				if (!hasWebGL()) {
+					alert("WebGL is not supported in your browser.");
+				}
+			}
+
+			var buildUrl =
+				"https://cdn.jsdelivr.net/gh/schoolflashx/bilbilu@main/Build";
+			var loaderUrl = buildUrl + "/fb9502bc7610d9c812fd76745164ef27.js";
+			var config = {
+				dataUrl: buildUrl + "/0aff4ee936778b905d874c8c2fb40213.data.unityweb",
+				frameworkUrl:
+					buildUrl + "/59f116a01ba156009be1331a920ead96.js.unityweb",
+				codeUrl: buildUrl + "/c04f87f256d6238c834e76a761d263d1.wasm.unityweb",
+				streamingAssetsUrl: "StreamingAssets",
+				companyName: "Gamebol",
+				productName: "Ultimate Car Driving",
+				productVersion: "1.0",
+			};
+
+			var container = document.querySelector("#gameContainer");
+			var canvas = document.querySelector("#gameCanvas");
+
+			CheckCompatibility();
+
+			var script = document.createElement("script");
+			script.src = loaderUrl;
+			script.onload = () => {
+				createUnityInstance(canvas, config, (progress) => {
+					// no loading bar updates
+				})
+					.then((unityInstance) => {
+						// Game loaded, no loading screen to hide
+					})
+					.catch((message) => {
+						alert(message);
+					});
+			};
+			document.body.appendChild(script);
+		</script>
+	</body>
+</html>

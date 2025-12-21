@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Dashboard</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				background-color: #0a0a0a;
+				color: #e0def4;
+				font-family:
+					-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+					Cantarell, sans-serif;
+			}
+
+			.landing-container {
+				max-width: 800px;
+				margin: 0 auto;
+				text-align: center;
+				padding: 3rem 2rem;
+			}
+
+			.landing-container h1 {
+				font-size: 4rem;
+				font-weight: 800;
+				margin-bottom: 1rem;
+				letter-spacing: -0.02em;
+			}
+
+			.landing-container h1 img {
+				max-width: 150px;
+				height: auto;
+				display: block;
+				margin: 0 auto 1rem;
+			}
+
+			.landing-container p {
+				font-size: 1.3rem;
+				color: #999;
+				margin-bottom: 2.5rem;
+				line-height: 1.6;
+			}
+
+			.landing-container p:last-of-type {
+				font-size: 1rem;
+				color: #666;
+				margin-bottom: 2.5rem;
+			}
+
+			.proxy-btn {
+				padding: 1.2rem 3rem;
+				background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
+				border: none;
+				border-radius: 0.6rem;
+				color: #fff;
+				font-size: 1.2rem;
+				font-weight: 700;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				font-family: inherit;
+				box-shadow: 0 4px 20px rgba(255, 140, 0, 0.4);
+			}
+
+			.proxy-btn:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 8px 30px rgba(255, 140, 0, 0.6);
+			}
+
+			.proxy-btn:active {
+				transform: translateY(-1px);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="landing-container">
+			<h1>
+				<img src="/devtoolsimgs/Logo.png" alt="Cheese Proxy" />
+				Cheesy Bread Proxy
+			</h1>
+			<p>
+				Welcome to The Cheese Proxy! Experience a fast, secure, and reliable
+				proxy.
+			</p>
+			<p>This proxy was built using Scramjet, a powerful web Proxy.</p>
+			<button class="proxy-btn" onclick="window.open('/playground.html');">
+				Open Proxy
+			</button>
+		</div>
+	</body>
+</html>

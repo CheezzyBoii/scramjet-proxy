@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta
+			name="apple-mobile-web-app-status-bar-style"
+			content="black-translucent"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+		/>
+		<meta http-equiv="pragma" content="no-cache" />
+		<title>Retro Bowl College</title>
+
+		<base href="https://cdn.jsdelivr.net/gh/genizy/retro-bowl-college@main/" />
+
+		<style>
+			body {
+				background: #000;
+				color: #ccc;
+				margin: 0;
+				padding: 0;
+				border: 0;
+			}
+			canvas {
+				image-rendering: pixelated;
+				-webkit-interpolation-mode: nearest-neighbor;
+				-ms-touch-action: none;
+				touch-action: none;
+				margin: 0;
+				padding: 0;
+				border: 0;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+			:-webkit-full-screen,
+			:-webkit-full-screen #canvas {
+				width: 100%;
+				height: 100%;
+			}
+			div.gm4html5_div_class {
+				margin: 0;
+				padding: 0;
+				border: 0;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="gm4html5_div_class" id="gm4html5_div_id">
+			<img
+				src="html5game/splash.png"
+				id="GM4HTML5_loadingscreen"
+				alt="Loading..."
+				style="display: none"
+			/>
+			<canvas id="canvas" width="100%" height="100%">
+				<p>Your browser doesn't support HTML5 canvas.</p>
+			</canvas>
+		</div>
+
+		<script src="/js/all.js"></script>
+		<script src="html5game/RetroBowl.js"></script>
+
+		<!-- Poki SDK (Cloak-Safe) -->
+		<script src="poki-sdk.js"></script>
+		<script>
+			(function () {
+				function safeLocationRedirect(url) {
+					try {
+						if (window === window.top) {
+							window.location.href = url;
+						} else {
+							console.warn("Cloak-safe: skipping top-level redirect");
+						}
+					} catch (err) {
+						console.warn("Blocked top access — cloak safe.");
+					}
+				}
+
+				function initGame(ok) {
+					window.PokiSDK_OK = ok;
+					if (typeof GameMaker_Init === "function") GameMaker_Init();
+				}
+
+				window.addEventListener("load", function () {
+					window.PokiSDK_loadState = 0;
+					if (window.PokiSDK && typeof PokiSDK.init === "function") {
+						PokiSDK.init()
+							.then(() => initGame(true))
+							.catch(() => initGame(false));
+					} else {
+						console.warn("PokiSDK not found — running without it.");
+						window.PokiSDK = null;
+						initGame(false);
+					}
+				});
+			})();
+		</script>
+	</body>
+</html>
