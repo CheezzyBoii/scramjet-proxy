@@ -663,7 +663,20 @@ function BrowserApp() {
 	// Listen for messages from the welcome page
 	window.addEventListener("message", (e) => {
 		if (e.data && e.data.type === "loadUrl" && e.data.url) {
-			this.url = e.data.url;
+			let url = e.data.url;
+
+			// Sanitize URL - remove /scramjet/ path prefix if present
+			try {
+				const decodedUrl = decodeURIComponent(url);
+				const pathPrefixMatch = decodedUrl.match(/\/scramjet\/(https?:\/\/)/i);
+				if (pathPrefixMatch) {
+					url = decodedUrl.substring(decodedUrl.indexOf(pathPrefixMatch[1]));
+				}
+			} catch (err) {
+				// Use original URL if decode fails
+			}
+
+			this.url = url;
 			showLoading();
 			return handleSubmit();
 		}
@@ -671,14 +684,54 @@ function BrowserApp() {
 
 	frame.addEventListener("urlchange", (e) => {
 		if (!e.url) return;
-		this.url = e.url;
-		if (e.url && e.url.startsWith("http")) addHistory(e.url);
+
+		let cleanUrl = e.url;
+
+		// Remove /scramjet/ path prefix if it exists in the URL
+		// Handle both encoded and decoded versions
+		try {
+			const decodedUrl = decodeURIComponent(cleanUrl);
+			const pathPrefixMatch = decodedUrl.match(/\/scramjet\/(https?:\/\/)/i);
+			if (pathPrefixMatch) {
+				cleanUrl = decodedUrl.substring(decodedUrl.indexOf(pathPrefixMatch[1]));
+			}
+		} catch (e) {
+			// If decoding fails, use original
+		}
+
+		this.url = cleanUrl;
+		if (cleanUrl && cleanUrl.startsWith("http")) addHistory(cleanUrl);
 		showLoading();
 	});
 
 	const handleSubmit = () => {
 		this.url = this.url.trim();
-		//  frame.go(this.url)
+
+		// Remove any encoded path prefixes like /scramjet/ that may have been added
+		// Decode the URL first to check for encoded versions
+		let decodedUrl = this.url;
+		try {
+			decodedUrl = decodeURIComponent(this.url);
+		} catch (e) {
+			// If decoding fails, use original URL
+		}
+
+		// Check if URL contains a path prefix followed by the actual URL (e.g., /scramjet/https://...)
+		const pathPrefixMatch = decodedUrl.match(/\/scramjet\/(https?:\/\/)/i);
+		if (pathPrefixMatch) {
+			// Extract just the actual URL part
+			this.url = decodedUrl.substring(decodedUrl.indexOf(pathPrefixMatch[1]));
+		}
+
+		// Also remove any double-encoded URLs
+		if (this.url.includes("%3A%2F%2F")) {
+			try {
+				this.url = decodeURIComponent(this.url);
+			} catch (e) {
+				// Keep original if decode fails
+			}
+		}
+
 		if (!this.url.startsWith("http")) {
 			this.url = "https://" + this.url;
 		}
