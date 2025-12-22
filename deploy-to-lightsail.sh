@@ -1,0 +1,314 @@
+#!/bin/bash
+
+# Scramjet AWS Lightsail Deployment Script
+# This script automates the deployment of Scramjet on AWS Lightsail
+
+set -e
+
+echo "=========================================="
+echo "Scramjet Lightsail Deployment Script"
+echo "=========================================="
+echo ""
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_success() {
+    echo -e "${GREEN}✓ $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}✗ $1${NC}"
+}
+
+print_info() {
+    echo -e "${YELLOW}ℹ $1${NC}"
+}
+
+# Check if running as root
+if [ "$EUID" -eq 0 ]; then 
+    print_error "Please do not run this script as root"
+    exit 1
+fi
+
+print_info "Step 1: Updating system packages..."
+sudo apt update && sudo apt upgrade -y
+print_success "System updated"
+
+print_info "Step 2: Installing Node.js 20.x..."
+if ! command -v node &> /dev/null; then
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+    sudo apt install -y nodejs
+    print_success "Node.js installed: $(node --version)"
+else
+    print_success "Node.js already installed: $(node --version)"
+fi
+
+print_info "Step 3: Installing pnpm..."
+if ! command -v pnpm &> /dev/null; then
+    sudo npm install -g pnpm
+    print_success "pnpm installed"
+else
+    print_success "pnpm already installed"
+fi
+
+print_info "Step 4: Installing Rust..."
+if ! command -v rustc &> /dev/null; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source "$HOME/.cargo/env"
+    print_success "Rust installed: $(rustc --version)"
+else
+    source "$HOME/.cargo/env"
+    print_success "Rust already installed: $(rustc --version)"
+fi
+
+print_info "Step 5: Installing build dependencies..."
+sudo apt install -y build-essential git binaryen
+print_success "Build dependencies installed"
+
+print_info "Step 6: Installing wasm-bindgen-cli..."
+if ! command -v wasm-bindgen &> /dev/null || [[ "$(wasm-bindgen --version | grep -o '0.2.[0-9]*')" != "0.2.100" ]]; then
+    cargo install wasm-bindgen-cli --version 0.2.100
+    print_success "wasm-bindgen-cli installed"
+else
+    print_success "wasm-bindgen-cli already installed"
+fi
+
+print_info "Step 7: Installing wasm-snip..."
+if ! command -v wasm-snip &> /dev/null; then
+    cargo install --git https://github.com/r58Playz/wasm-snip
+    print_success "wasm-snip installed"
+else
+    print_success "wasm-snip already installed"
+fi
+
+print_info "Step 8: Installing Nginx..."
+if ! command -v nginx &> /dev/null; then
+    sudo apt install -y nginx
+    print_success "Nginx installed"
+else
+    print_success "Nginx already installed"
+fi
+
+print_info "Step 9: Cloning Scramjet repository..."
+if [ ! -d "/opt/scramjet" ]; then
+    cd /opt
+    sudo git clone --recursive https://github.com/MercuryWorkshop/scramjet.git
+    sudo chown -R $USER:$USER scramjet
+    print_success "Scramjet cloned to /opt/scramjet"
+else
+    print_success "Scramjet directory already exists"
+fi
+
+cd /opt/scramjet
+
+print_info "Step 10: Installing npm dependencies..."
+pnpm install
+print_success "Dependencies installed"
+
+print_info "Step 11: Building WASM rewriter..."
+source "$HOME/.cargo/env"
+pnpm rewriter:build
+print_success "WASM rewriter built"
+
+print_info "Step 12: Building Scramjet..."
+pnpm build
+print_success "Scramjet built successfully"
+
+print_info "Step 13: Creating production server configuration..."
+cat > /opt/scramjet/server-production.js << 'EOF'
+// Production server
+import { createBareServer } from "@nebula-services/bare-server-node";
+import { createServer } from "http";
+import Fastify from "fastify";
+import fastifyStatic from "@fastify/static";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { server as wisp } from "@mercuryworkshop/wisp-js/server";
+
+// Transports
+import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
+import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
+import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
+import { bareModulePath } from "@mercuryworkshop/bare-as-module3";
+
+const bare = createBareServer("/bare/", {
+    logErrors: false,
+    blockLocal: true,
+});
+
+const fastify = Fastify({
+    serverFactory: (handler) => {
+        return createServer()
+            .on("request", (req, res) => {
+                res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+                res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+
+                if (bare.shouldRoute(req)) {
+                    bare.routeRequest(req, res);
+                } else {
+                    handler(req, res);
+                }
+            })
+            .on("upgrade", (req, socket, head) => {
+                if (bare.shouldRoute(req)) {
+                    bare.routeUpgrade(req, socket, head);
+                } else {
+                    wisp.routeRequest(req, socket, head);
+                }
+            });
+    },
+});
+
+const PORT = process.env.PORT || 3000;
+
+fastify.register(fastifyStatic, {
+    root: join(process.cwd(), "static"),
+    prefix: "/",
+});
+
+fastify.register(fastifyStatic, {
+    root: join(process.cwd(), "dist"),
+    prefix: "/dist/",
+    decorateReply: false,
+});
+
+fastify.register(fastifyStatic, {
+    root: baremuxPath,
+    prefix: "/baremux/",
+    decorateReply: false,
+});
+
+fastify.register(fastifyStatic, {
+    root: epoxyPath,
+    prefix: "/epoxy/",
+    decorateReply: false,
+});
+
+fastify.register(fastifyStatic, {
+    root: libcurlPath,
+    prefix: "/libcurl/",
+    decorateReply: false,
+});
+
+fastify.register(fastifyStatic, {
+    root: bareModulePath,
+    prefix: "/baremod/",
+    decorateReply: false,
+});
+
+fastify.listen(
+    {
+        port: PORT,
+        host: "0.0.0.0",
+    },
+    (err) => {
+        if (err) {
+            console.error(err);
+            process.exit(1);
+        }
+        console.log(\`Server running on http://0.0.0.0:\${PORT}\`);
+    }
+);
+EOF
+print_success "Production server configuration created"
+
+print_info "Step 14: Creating systemd service..."
+sudo tee /etc/systemd/system/scramjet.service > /dev/null << EOF
+[Unit]
+Description=Scramjet Proxy Server
+After=network.target
+
+[Service]
+Type=simple
+User=$USER
+WorkingDirectory=/opt/scramjet
+Environment="PATH=$HOME/.cargo/bin:/usr/bin:/bin:/usr/local/bin"
+Environment="NODE_ENV=production"
+ExecStart=/usr/bin/node server-production.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable scramjet
+print_success "Systemd service created and enabled"
+
+print_info "Step 15: Configuring Nginx..."
+sudo tee /etc/nginx/sites-available/scramjet > /dev/null << 'EOF'
+server {
+    listen 80;
+    server_name _;
+
+    client_max_body_size 100M;
+    proxy_buffer_size 128k;
+    proxy_buffers 4 256k;
+    proxy_busy_buffers_size 256k;
+
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_buffering off;
+    proxy_request_buffering off;
+
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 60s;
+    proxy_read_timeout 60s;
+
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+}
+EOF
+
+sudo ln -sf /etc/nginx/sites-available/scramjet /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t
+sudo systemctl restart nginx
+print_success "Nginx configured and restarted"
+
+print_info "Step 16: Starting Scramjet service..."
+sudo systemctl start scramjet
+sleep 3
+if sudo systemctl is-active --quiet scramjet; then
+    print_success "Scramjet service started successfully"
+else
+    print_error "Scramjet service failed to start. Check logs with: sudo journalctl -u scramjet -n 50"
+    exit 1
+fi
+
+echo ""
+echo "=========================================="
+print_success "Deployment Complete!"
+echo "=========================================="
+echo ""
+print_info "Service Status:"
+sudo systemctl status scramjet --no-pager -l
+echo ""
+print_info "Next Steps:"
+echo "  1. Get your server's IP address: curl ifconfig.me"
+echo "  2. Test in browser: http://YOUR_IP"
+echo "  3. Configure CloudFront (see AWS_DEPLOYMENT_GUIDE.md)"
+echo "  4. Set up SSL with: sudo certbot --nginx -d your-domain.com"
+echo ""
+print_info "Useful Commands:"
+echo "  - View logs: sudo journalctl -u scramjet -f"
+echo "  - Restart service: sudo systemctl restart scramjet"
+echo "  - Stop service: sudo systemctl stop scramjet"
+echo "  - Update Scramjet: cd /opt/scramjet && git pull && pnpm install && pnpm rewriter:build && pnpm build && sudo systemctl restart scramjet"
+echo ""
+print_success "Happy proxying! 🚀"
