@@ -267,66 +267,7 @@
 				</div>
 			</div>
 
-			<!-- Performance Settings -->
-			<div class="settings-section">
-				<h3>Performance</h3>
-				<div class="form-group">
-					<div class="checkbox-group">
-						<input
-							type="checkbox"
-							id="cache-toggle"
-							checked
-							onchange="toggleCache()"
-						/>
-						<label for="cache-toggle">Enable Cache</label>
-					</div>
-				</div>
-				<div class="form-group">
-					<button
-						class="settings-btn"
-						style="width: auto; display: inline-block"
-						onclick="clearCache()"
-					>
-						Clear Cache
-					</button>
-				</div>
-			</div>
-
-			<!-- Privacy & Security -->
-			<div class="settings-section">
-				<h3>Privacy & Security</h3>
-				<div class="form-group">
-					<div class="checkbox-group">
-						<input
-							type="checkbox"
-							id="history-toggle"
-							checked
-							onchange="toggleHistory()"
-						/>
-						<label for="history-toggle">Save Browsing History</label>
-					</div>
-				</div>
-				<div class="form-group">
-					<button
-						class="settings-btn"
-						style="width: auto; display: inline-block"
-						onclick="clearBrowsingData()"
-					>
-						Clear All Data
-					</button>
-				</div>
-			</div>
-
-			<div class="button-group">
-				<button class="settings-btn" onclick="applySettings()">
-					Apply Settings
-				</button>
-				<button class="settings-btn reset-btn" onclick="resetSettings()">
-					Reset to Default
-				</button>
-			</div>
-
-			<p class="footer-text">©2025 Cheese Bread Proxy Settings</p>
+			<p class="footer-text">©2025 The Cheesy Proxy</p>
 		</div>
 
 		<script>
@@ -342,25 +283,23 @@
 				},
 				clever: {
 					title: "Clever | Portal",
-					favicon:
-						"https://www.clever.com/wp-content/uploads/2023/06/cropped-Favicon-512px-180x180.png",
+					favicon: "/favicons/clever-fav.webp",
 				},
 				classlink: {
 					title: "My Apps",
-					favicon: "https://myapps.classlink.com/favicon.ico",
+					favicon: "/favicons/classlink-fav.ico",
 				},
 				mathia: {
 					title: "Carnegie Learning",
-					favicon: "https://mathstream.carnegielearning.com/assets/favicon.ico",
+					favicon: "/favicons/carnegielearning-fav.ico",
 				},
 				schoology: {
 					title: "Home | Schoology",
-					favicon:
-						"https://asset-cdn.schoology.com/sites/all/themes/schoology_theme/favicon.ico",
+					favicon: "/favicons/schoology-fav.ico",
 				},
 				aspen: {
 					title: "Aspen: Pages",
-					favicon: "https://dodeasis.myfollett.com/aspen/images/favicon.ico",
+					favicon: "/favicons/aspen-fav.ico",
 				},
 			};
 
@@ -377,8 +316,8 @@
 			}
 
 			function updateCustom() {
-				const title = document.getElementById("custom-title").value;
-				const favicon = document.getElementById("custom-favicon").value;
+				const title = document.getElementById("custom-title").value.trim();
+				const favicon = document.getElementById("custom-favicon").value.trim();
 
 				// Change title globally
 				if (title) {
@@ -389,14 +328,17 @@
 				}
 
 				if (favicon) {
+					const bust = `${favicon}${favicon.includes("?") ? "&" : "?"}t=${Date.now()}`;
+
 					// Change favicon in current window
 					let faviconLink = document.querySelector('link[rel="icon"]');
 					if (!faviconLink) {
 						faviconLink = document.createElement("link");
 						faviconLink.rel = "icon";
+						faviconLink.type = "image/x-icon";
 						document.head.appendChild(faviconLink);
 					}
-					faviconLink.href = favicon;
+					faviconLink.href = bust;
 
 					// Change favicon in parent window if in iframe
 					if (window.parent && window.parent !== window) {
@@ -405,9 +347,10 @@
 						if (!parentFaviconLink) {
 							parentFaviconLink = window.parent.document.createElement("link");
 							parentFaviconLink.rel = "icon";
+							parentFaviconLink.type = "image/x-icon";
 							window.parent.document.head.appendChild(parentFaviconLink);
 						}
-						parentFaviconLink.href = favicon;
+						parentFaviconLink.href = bust;
 					}
 				}
 
@@ -416,64 +359,15 @@
 				localStorage.setItem("custom-favicon", favicon);
 			}
 
-			function toggleCache() {
-				const enabled = document.getElementById("cache-toggle").checked;
-				localStorage.setItem("cache-enabled", enabled);
-			}
-
-			function clearCache() {
-				if (confirm("Are you sure you want to clear the cache?")) {
-					localStorage.removeItem("game-cache");
-					sessionStorage.clear();
-					alert("Cache cleared successfully!");
-				}
-			}
-
-			function toggleHistory() {
-				const enabled = document.getElementById("history-toggle").checked;
-				localStorage.setItem("history-enabled", enabled);
-			}
-
-			function clearBrowsingData() {
-				if (confirm("This will clear all your browsing data. Are you sure?")) {
-					localStorage.clear();
-					sessionStorage.clear();
-					alert("All data cleared successfully!");
-					location.reload();
-				}
-			}
-
-			function resetSettings() {
-				if (
-					confirm("Are you sure you want to reset all settings to default?")
-				) {
-					document.getElementById("site-select").value = "";
-					document.getElementById("custom-title").value = "";
-					document.getElementById("custom-favicon").value = "";
-					document.getElementById("cache-toggle").checked = true;
-					document.getElementById("history-toggle").checked = true;
-					location.reload();
-				}
-			}
-
 			// Load settings from localStorage on page load
 			window.addEventListener("DOMContentLoaded", () => {
 				const savedTitle = localStorage.getItem("custom-title");
 				const savedFavicon = localStorage.getItem("custom-favicon");
 
-				const cacheEnabled = localStorage.getItem("cache-enabled") !== "false";
-				const historyEnabled =
-					localStorage.getItem("history-enabled") !== "false";
-				const notificationsEnabled =
-					localStorage.getItem("notifications-enabled") !== "false";
-
 				if (savedTitle)
 					document.getElementById("custom-title").value = savedTitle;
 				if (savedFavicon)
 					document.getElementById("custom-favicon").value = savedFavicon;
-
-				document.getElementById("cache-toggle").checked = cacheEnabled;
-				document.getElementById("history-toggle").checked = historyEnabled;
 			});
 		</script>
 	</body>

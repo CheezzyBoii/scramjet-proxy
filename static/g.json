@@ -1,0 +1,246 @@
+[
+	{ "name": "1v1.lol", "image": "img/1v1.lol.webp", "url": "g/1v1.lol.html" },
+	{
+		"name": "Basket Random",
+		"image": "img/Basket-Random.webp",
+		"url": "g/Basket-Random.html"
+	},
+	{ "name": "BitLife", "image": "img/BitLife.webp", "url": "g/BitLife.html" },
+	{
+		"name": "Buckshot Roulette",
+		"image": "img/Buckshot-Roulette.webp",
+		"url": "g/Buckshot-Roulette.html"
+	},
+	{
+		"name": "Choppy Orc",
+		"image": "img/Choppy-Orc.webp",
+		"url": "g/Choppy-Orc.html"
+	},
+	{
+		"name": "Classi Cube",
+		"image": "img/classi-cube.webp",
+		"url": "g/classi-cube.html"
+	},
+	{
+		"name": "Cookie Clicker",
+		"image": "img/Cookie-Clicker.webp",
+		"url": "g/Cookie-Clicker.html"
+	},
+	{
+		"name": "Crash Bandicoot",
+		"image": "img/Crash-Bandicoot.webp",
+		"url": "g/Crash-Bandicoot.html"
+	},
+	{
+		"name": "Crash Bandicoot 2",
+		"image": "img/Crash-Bandicoot-2.webp",
+		"url": "g/Crash-Bandicoot-2.html"
+	},
+	{
+		"name": "Death Run 3D",
+		"image": "img/Death-Run-3D.webp",
+		"url": "g/Death-Run-3D.html"
+	},
+	{
+		"name": "Drift Boss",
+		"image": "img/Drift-Boss.webp",
+		"url": "g/Drift-Boss.html"
+	},
+	{
+		"name": "Eaglercraft 1.12.2",
+		"image": "img/Eaglercraft-1.12.2.webp",
+		"url": "g/Eaglercraft-1.12.2.html"
+	},
+	{
+		"name": "Eaglercraft 1.8.8",
+		"image": "img/Eaglercraft-1.8.8.webp",
+		"url": "g/Eaglercraft-1.8.8.html"
+	},
+	{
+		"name": "Emulator JS",
+		"image": "img/JSEmulator.webp",
+		"url": "g/JSEmulator.html"
+	},
+	{
+		"name": "Final Earth 2",
+		"image": "img/Final-Earth-2.webp",
+		"url": "g/Final-Earth-2.html"
+	},
+	{
+		"name": "Final Fantasy",
+		"image": "img/Final-Fantasy.webp",
+		"url": "g/Final-Fantasy.html"
+	},
+	{ "name": "FNAF", "image": "img/FNAF.webp", "url": "g/FNAF.html" },
+	{ "name": "FNAF 2", "image": "img/FNAF-2.webp", "url": "g/FNAF-2.html" },
+	{
+		"name": "Geometry Dash Classic",
+		"image": "img/Geo-Dash-Classic.webp",
+		"url": "g/Geo-Dash-Classic.html"
+	},
+	{
+		"name": "Getaway Shootout",
+		"image": "img/Getaway-Shootout.webp",
+		"url": "g/Getaway-Shootout.html"
+	},
+	{
+		"name": "Getting Over It",
+		"image": "img/Getting-Over-It.webp",
+		"url": "g/Getting-Over-It.html"
+	},
+	{
+		"name": "Happy Wheels",
+		"image": "img/Happy-Wheels.webp",
+		"url": "g/Happy-Wheels.html"
+	},
+	{
+		"name": "Hollow Knight",
+		"image": "img/Hollow-Knight.webp",
+		"url": "g/Hollow-Knight.html"
+	},
+	{
+		"name": "House of Hazards",
+		"image": "img/House-of-Hazards.webp",
+		"url": "g/House-of-Hazards.html"
+	},
+	{
+		"name": "Kindergarten",
+		"image": "img/Kindergarten.webp",
+		"url": "g/Kindergarten.html"
+	},
+	{
+		"name": "Kindergarten 3",
+		"image": "img/Kindergarten-3.webp",
+		"url": "g/Kindergarten-3.html"
+	},
+	{
+		"name": "Learn to Fly 2",
+		"image": "img/Learn-2-Fly.webp",
+		"url": "g/Learn-2-Fly.html"
+	},
+	{
+		"name": "Metal Gear Solid",
+		"image": "img/Metal-Gear-Solid.webp",
+		"url": "g/Metal-Gear-Solid.html"
+	},
+	{
+		"name": "Monkey Mart",
+		"image": "img/Monkey-Mart.webp",
+		"url": "g/Monkey-Mart.html"
+	},
+	{
+		"name": "Moto X3M",
+		"image": "img/Moto-X3M.webp",
+		"url": "g/Moto-X3M.html"
+	},
+	{
+		"name": "Moto X3M 2",
+		"image": "img/Moto-X3M-2.webp",
+		"url": "g/Moto-X3M-2.html"
+	},
+	{
+		"name": "Moto X3M Spooky",
+		"image": "img/Moto-X3M-Spooky.webp",
+		"url": "g/Moto-X3M-Spooky.html"
+	},
+	{ "name": "N Gon", "image": "img/N-Gon.webp", "url": "g/N-Gon.html" },
+	{
+		"name": "Nazi Zombies: Portable",
+		"image": "img/NZ-Portable.webp",
+		"url": "g/NZ-Portable.html"
+	},
+	{
+		"name": "Paper.io 2",
+		"image": "img/Paper-IO-2.webp",
+		"url": "g/Paper-IO-2.html"
+	},
+	{
+		"name": "Pokemon Blue",
+		"image": "img/Pokemon-Blue.webp",
+		"url": "g/Pokemon-Blue.html"
+	},
+	{
+		"name": "Pokemon Ruby",
+		"image": "img/Pokemon-Ruby.webp",
+		"url": "g/Pokemon-Ruby.html"
+	},
+	{
+		"name": "Ragdoll Archers",
+		"image": "img/ragdoll-archers.webp",
+		"url": "g/ragdoll-archers.html"
+	},
+	{
+		"name": "Retro Bowl",
+		"image": "img/Retro-Bowl.webp",
+		"url": "g/Retro-Bowl.html"
+	},
+	{
+		"name": "Retro Bowl College",
+		"image": "img/Retro-Bowl-College.webp",
+		"url": "g/Retro-Bowl-College.html"
+	},
+	{ "name": "Slope", "image": "img/Slope.webp", "url": "g/Slope.html" },
+	{
+		"name": "Snow Rider 3D",
+		"image": "img/Snow-Rider-3D.webp",
+		"url": "g/Snow-RIder-3D.html"
+	},
+	{
+		"name": "Snowbattle.io",
+		"image": "img/Snowbattle.io.webp",
+		"url": "g/Snowbattle.io.html"
+	},
+	{
+		"name": "Sonic Advance 2",
+		"image": "img/Sonic-Advance-2.webp",
+		"url": "g/Sonic-Advance-2.html"
+	},
+	{
+		"name": "State.io",
+		"image": "img/State.io.webp",
+		"url": "g/State.io.html"
+	},
+	{
+		"name": "Stickman Hook",
+		"image": "img/Stickman-Hook.webp",
+		"url": "g/Stickman-Hook.html"
+	},
+	{
+		"name": "Super Mario Bros",
+		"image": "img/Super-Mario-Bros.webp",
+		"url": "g/Super-Mario-Bros.html"
+	},
+	{
+		"name": "Time Shooter",
+		"image": "img/Time-Shooter.webp",
+		"url": "g/Time-Shooter.html"
+	},
+	{
+		"name": "Tomb Of The Mask",
+		"image": "img/Tomb-Of-The-Mask.webp",
+		"url": "g/Tomb-Of-The-Mask.html"
+	},
+	{
+		"name": "Tube Jumpers",
+		"image": "img/Tube-Jumpers.webp",
+		"url": "g/Tube-Jumpers.html"
+	},
+	{
+		"name": "Ultrakill",
+		"image": "img/Ultrakill.webp",
+		"url": "g/Ultrakill.html"
+	},
+	{
+		"name": "Undertale",
+		"image": "img/Undertale.webp",
+		"url": "g/Undertale.html"
+	},
+	{
+		"name": "Undertale Yellow",
+		"image": "img/Undertale-Yellow.webp",
+		"url": "g/Undertale-Yellow.html"
+	},
+	{ "name": "Vex 1", "image": "img/Vex-1.webp", "url": "g/Vex-1.html" },
+	{ "name": "Vex 2", "image": "img/Vex-2.webp", "url": "g/Vex-2.html" },
+	{ "name": "Vex 3", "image": "img/Vex-3.webp", "url": "g/Vex-3.html" }
+]

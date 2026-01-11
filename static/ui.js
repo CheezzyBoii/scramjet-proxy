@@ -236,10 +236,10 @@ function Config() {
       background-color: #1a1a1a;
       border-radius: 8px;
       color: #fff;
-      padding: 0.9rem;
+      padding: 1.2rem 1.5rem;
       transition: all 0.3s ease;
       cursor: pointer;
-      font-size: 0.95rem;
+      font-size: 1.1rem;
       font-weight: 600;
     }
 
@@ -927,13 +927,13 @@ function BrowserApp() {
 					showLoading();
 					frame.reload();
 				}}>&#x21bb;</button>
-        <button on:click=${() => (window.eruditState ? (eruda.hide(), (window.eruditState = false)) : (eruda.show(), (window.eruditState = true)))}>console</button>
+        <button on:click=${() => (window.eruditState ? (eruda.hide(), (window.eruditState = false)) : (eruda.show(), (window.eruditState = true)))} style="display: flex; align-items: center; justify-content: center;"><img src="/devtoolsimgs/dev-tools.svg" alt="console" style="width: 20px; height: 20px;"></button>
         <input class="bar" autocomplete="off" autocapitalize="off" autocorrect="off" 
         bind:value=${use(this.url)} on:input=${(e) => {
 					this.url = e.target.value;
 				}} on:keyup=${(e) => e.keyCode == 13 && (store.url = this.url) && handleSubmit()}></input>
 
-        <button on:click=${() => window.open(scramjet.encodeUrl(this.url))}>open</button>
+		<button on:click=${() => window.open(scramjet.encodeUrl(this.url))} style="display: flex; align-items: center; justify-content: center;"><img src="/devtoolsimgs/open-link.svg" alt="open link" style="width: 20px; height: 20px;"></button>
         <button on:click=${() => cfg.showModal()}>config</button>
         <button on:click=${() => {
 					showHistoryModal();

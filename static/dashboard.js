@@ -175,7 +175,7 @@ function Dashboard() {
 			if (view === "landing") {
 				iframe.src = "/dashboard.html";
 			} else if (view === "games") {
-				iframe.src = "/games.html";
+				iframe.src = "/g.html";
 			} else if (view === "tools") {
 				iframe.src = "/tools.html";
 			} else if (view === "settings") {
