@@ -86,7 +86,7 @@ fastify.register(fastifyStatic, {
 	decorateReply: false,
 });
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT) || 1337 : 1337;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) || 80 : 80;
 
 fastify.listen({
 	port: PORT,

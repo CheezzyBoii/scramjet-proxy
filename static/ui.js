@@ -192,138 +192,70 @@ function clearHistory() {
 function Config() {
 	this.css = `
     transition: opacity 0.4s ease;
-    :modal[open] {
-        animation: fade 0.4s ease normal;
+    :modal[open] { animation: fade 0.4s ease normal; }
+    :modal::backdrop { backdrop-filter: blur(3px); }
+
+    .buttons {
+      display: flex;
+      gap: 0.5em;
+      align-self: end;
     }
 
-    :modal::backdrop {
-     backdrop-filter: blur(3px);
-    }
-
-    .config-container {
-      padding: 2rem;
-      min-width: 520px;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-
-    .config-section {
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      background: rgba(255, 140, 0, 0.05);
-      border: 1px solid rgba(255, 140, 0, 0.2);
-      border-radius: 12px;
-    }
-
-    .config-section h4 {
-      color: #ff8c00;
-      margin-bottom: 1rem;
-      margin-top: 0;
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    .transport-buttons {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-
-    .transport-btn {
-      border: 2px solid #ff8c00;
+    .buttons button {
+      border: 1px solid #ff8c00;
       background-color: #1a1a1a;
-      border-radius: 8px;
-      color: #fff;
-      padding: 1.2rem 1.5rem;
-      transition: all 0.3s ease;
+      border-radius: 0.75em;
+      color: #ff8c00;
+      padding: 0.45em;
+      transition: all 0.2s ease;
       cursor: pointer;
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .transport-btn:hover {
-      background-color: rgba(255, 140, 0, 0.15);
-      box-shadow: 0 0 15px rgba(255, 140, 0, 0.4);
-      transform: translateY(-3px);
-    }
-
-    .transport-btn.active {
-      background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
-      border-color: #ffa500;
-      box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
-    }
-
-    .input-group {
-      margin-bottom: 1.2rem;
-    }
-
-    .input-group label {
-      display: block;
-      color: #e0def4;
-      margin-bottom: 0.6rem;
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-
-    .input-group input {
-      width: 100%;
-      background-color: #0a0a0a;
-      border: 2px solid rgba(255, 140, 0, 0.3);
-      border-radius: 8px;
-      color: #fff;
-      outline: none;
-      padding: 0.85rem;
-      transition: all 0.3s ease;
       font-family: inherit;
-      font-size: 0.95rem;
     }
 
-    .input-group input:focus {
-      border-color: #ff8c00;
-      box-shadow: 0 0 12px rgba(255, 140, 0, 0.4);
-      background-color: rgba(255, 140, 0, 0.02);
+    .buttons button:hover {
+      background-color: rgba(255, 140, 0, 0.15);
+    }
+
+    .buttons button.active {
+      background-color: #ff8c00;
+      color: #000;
+    }
+
+    .input_row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2em;
+    }
+
+    .input_row label {
+      font-size: 0.7rem;
+      color: #ff8c00;
+    }
+
+    .input_row input {
+      background-color: #1a1a1a;
+      border: 1px solid #ff8c00;
+      border-radius: 0.3em;
+      color: #ff8c00;
+      padding: 0.3em;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .input_row input:focus {
+      border-color: #ffa500;
+      box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
     }
 
     .transport-display {
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.5);
-      border: 2px solid rgba(255, 140, 0, 0.2);
-      border-radius: 8px;
       color: #ff8c00;
       font-family: 'Courier New', monospace;
-      font-size: 0.9rem;
-      margin-top: 0.75rem;
-      word-break: break-all;
+      font-size: 0.9em;
+      margin: 0.5em 0;
     }
 
-    .config-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255, 140, 0, 0.2);
-    }
-
-    .btn-close {
-      border: 2px solid #ff8c00;
-      background-color: #1a1a1a;
-      border-radius: 8px;
-      color: #fff;
-      padding: 0.8rem 1.8rem;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .btn-close:hover {
-      background-color: rgba(255, 140, 0, 0.2);
-      box-shadow: 0 0 12px rgba(255, 140, 0, 0.3);
-      transform: translateY(-2px);
+    .centered {
+      justify-content: center;
     }
   `;
 
@@ -349,49 +281,34 @@ function Config() {
 	}
 
 	return html`
-      <dialog class="cfg" style="background-color: #0d0d0d; color: white; border-radius: 10px; border: 1px solid #ff8c00; padding: 0;">
-        <div class="config-container">
-          <h3 style="color: #ff8c00; margin-top: 0; margin-bottom: 1.5rem; font-size: 1.3rem;">Connection Configuration</h3>
-          
-          <div class="config-section">
-            <h4>Transport Protocol</h4>
-            <div class="transport-buttons">
-              <button class="transport-btn ${use(store.transport) === "/baremod/index.mjs" ? "active" : ""}" 
-                      data-transport="/baremod/index.mjs"
-                      on:click=${() => setTransport("/baremod/index.mjs", [])}>
-                Bare Server 3
-              </button>
-              <button class="transport-btn ${use(store.transport) === "/libcurl/index.mjs" ? "active" : ""}"
-                      data-transport="/libcurl/index.mjs"
-                      on:click=${() => setTransport("/libcurl/index.mjs", [{ wisp: store.wispurl }])}>
-                libcurl.js
-              </button>
-              <button class="transport-btn ${use(store.transport) === "/epoxy/index.mjs" ? "active" : ""}"
-                      data-transport="/epoxy/index.mjs"
-                      on:click=${() => setTransport("/epoxy/index.mjs", [{ wisp: store.wispurl }])}>
-                Epoxy
-              </button>
-            </div>
-            <div class="transport-display">
-              Current: ${use(store.transport)}
-            </div>
+      <dialog class="cfg" style="background-color: #0d0d0d; color: #ff8c00; border-radius: 8px;">
+        <div style="align-self: end">
+          <div class=${[flex, "buttons"]}>
+            <button class=${use(store.transport) === "/baremod/index.mjs" ? "active" : ""}
+                    on:click=${() => setTransport("/baremod/index.mjs", [])}>
+              use bare server 3
+            </button>
+            <button class=${use(store.transport) === "/libcurl/index.mjs" ? "active" : ""}
+                    on:click=${() => setTransport("/libcurl/index.mjs", [{ wisp: store.wispurl }])}>
+              use libcurl.js
+            </button>
+            <button class=${use(store.transport) === "/epoxy/index.mjs" ? "active" : ""}
+                    on:click=${() => setTransport("/epoxy/index.mjs", [{ wisp: store.wispurl }])}>
+              use epoxy
+            </button>
           </div>
-
-          <div class="config-section">
-            <h4>Server URLs</h4>
-            <div class="input-group">
-              <label for="wisp_url_input">Wisp Server URL</label>
-              <input id="wisp_url_input" bind:value=${use(store.wispurl)} spellcheck="false" placeholder="wss://example.com/wisp/"></input>
-            </div>
-            <div class="input-group">
-              <label for="bare_url_input">Bare Server URL</label>
-              <input id="bare_url_input" bind:value=${use(store.bareurl)} spellcheck="false" placeholder="https://example.com/bare/"></input>
-            </div>
-          </div>
-
-          <div class="config-footer">
-            <button class="btn-close" on:click=${() => handleModalClose(this.root)}>Close</button>
-          </div>
+        </div>
+        <div class=${[flex, col, "input_row"]}>
+          <label for="wisp_url_input">Wisp URL:</label>
+          <input id="wisp_url_input" bind:value=${use(store.wispurl)} spellcheck="false"></input>
+        </div>
+        <div class=${[flex, col, "input_row"]}>
+          <label for="bare_url_input">Bare URL:</label>
+          <input id="bare_url_input" bind:value=${use(store.bareurl)} spellcheck="false"></input>
+        </div>
+        <div class="transport-display">${use(store.transport)}</div>
+        <div class=${[flex, "buttons", "centered"]}>
+          <button on:click=${() => handleModalClose(this.root)}>close</button>
         </div>
       </dialog>
   `;
