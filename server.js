@@ -12,8 +12,10 @@ import { server as wisp } from "@mercuryworkshop/wisp-js/server";
 
 //transports
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
+// @ts-ignore - module exists but lacks type declarations
 import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
+// @ts-ignore - module exists but lacks type declarations
 import { bareModulePath } from "@mercuryworkshop/bare-as-module3";
 import { chmodSync, mkdirSync, writeFileSync } from "fs";
 
@@ -26,6 +28,7 @@ wisp.options.allow_loopback_ips = true;
 wisp.options.allow_private_ips = true;
 
 const fastify = Fastify({
+	// @ts-ignore - serverFactory type mismatch between http versions
 	serverFactory: (handler) => {
 		return createServer()
 			.on("request", (req, res) => {

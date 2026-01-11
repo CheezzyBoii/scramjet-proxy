@@ -30,12 +30,12 @@
 			.tools-container {
 				max-width: 1200px;
 				margin: 0 auto;
-				padding: 2rem;
+				padding: 8rem 8px;
 			}
 
 			.tools-header {
 				text-align: center;
-				margin-bottom: 2rem;
+				margin-bottom: 4rem;
 			}
 
 			.tools-grid {
@@ -47,63 +47,45 @@
 				display: inline-block;
 				margin: 15px;
 				padding: 15px 15px;
-				background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
+				background: #1a1a1a;
+				border: 2px solid #ff8c00;
 				border-radius: 20px;
 				cursor: pointer;
 				transition:
 					background 0.4s ease,
 					transform 0.2s ease,
-					box-shadow 0.3s ease;
+					box-shadow 0.3s ease,
+					border-color 0.3s ease;
 				color: #fff;
 				font-weight: 600;
 				text-align: center;
-				box-shadow: 0 4px 10px rgba(255, 140, 0, 0.2);
+				box-shadow: 0 0 10px rgba(255, 140, 0, 0.2);
 				opacity: 0;
 				transform: scale(0.95);
-				animation: fadeIn 0.3s ease-out forwards;
+				transition:
+					opacity 0.3s ease,
+					transform 0.3s ease;
 			}
 
-			.button-container:nth-child(1) {
-				animation-delay: 0s;
-			}
-			.button-container:nth-child(2) {
-				animation-delay: 0.05s;
-			}
-			.button-container:nth-child(3) {
-				animation-delay: 0.1s;
-			}
-			.button-container:nth-child(4) {
-				animation-delay: 0.15s;
-			}
-			.button-container:nth-child(5) {
-				animation-delay: 0.2s;
-			}
-			.button-container:nth-child(n + 6) {
-				animation-delay: 0.25s;
-			}
-
-			@keyframes fadeIn {
-				from {
-					opacity: 0;
-					transform: scale(0.95);
-				}
-				to {
-					opacity: 1;
-					transform: scale(1);
-				}
+			.button-container.show {
+				opacity: 1;
+				transform: scale(1);
 			}
 
 			.button-container:hover {
-				background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
-				transform: scale(1.07);
-				box-shadow: 0 6px 15px rgba(255, 140, 0, 0.4);
+				background: #0a0a0a;
+				border-color: #ffa500;
+				transform: scale(1.025);
+				box-shadow:
+					0 8px 25px rgba(255, 140, 0, 0.4),
+					0 0 20px rgba(255, 140, 0, 0.5);
 			}
 
 			.button-content {
 				display: flex;
 				flex-direction: column;
 				align-items: center;
-				gap: 0.5rem;
+				gap: 1rem;
 				color: white;
 				text-align: center;
 			}
@@ -136,11 +118,16 @@
 	<body>
 		<div class="tools-container">
 			<div class="tools-grid" id="toolsGrid"></div>
-			<p class="footer-text">©2025 Cheese Bread Proxy Tools</p>
+			<p class="footer-text">©2025 The Cheese Proxy</p>
 		</div>
 
 		<script>
 			const tools = [
+				{
+					name: "Ruffle",
+					url: "/tools/Ruffle.html",
+					image: "/devtoolsimgs/tools/Ruffle.webp",
+				},
 				{
 					name: "Youtube Unblocker",
 					url: "/tools/yt.html",
@@ -150,6 +137,11 @@
 					name: "ExtHang3r",
 					url: "/tools/ExtHang3r.html",
 					image: "/devtoolsimgs/tools/ExtHang3r.png",
+				},
+				{
+					name: "Gemini",
+					url: "https://www.google.com/search?q=&sca_esv=c05576a0624c228e&sxsrf=ANbL-n7zVr6Uhwk7qLTyNOuAf9BRjcqGXw%3A1768087448091&source=hp&ei=mN9iab7lA6Gsxc8Pz4-isAI&iflsig=AFdpzrgAAAAAaWLtqFZ7EU6k6PkpWsulXZ7A-GI2Oy2_&aep=22&udm=50&ved=0ahUKEwi-kZiCj4KSAxUhVvEDHc-HCCYQteYPCBk&oq=&gs_lp=Egdnd3Mtd2l6IgBIAFAAWABwAHgAkAEAmAEAoAEAqgEAuAEByAEAmAIAoAIAmAMAkgcAoAcAsgcAuAcAwgcAyAcAgAgA&sclient=gws-wiz",
+					image: "/devtoolsimgs/tools/Gemini.webp",
 				},
 			];
 
@@ -172,6 +164,8 @@
           </div>
         `;
 					grid.appendChild(div);
+					// Trigger animation
+					setTimeout(() => div.classList.add("show"), 10 + index * 50);
 				});
 			}
 

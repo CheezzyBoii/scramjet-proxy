@@ -97,7 +97,7 @@ fi
 print_info "Step 9: Cloning Scramjet repository..."
 if [ ! -d "/opt/scramjet" ]; then
     cd /opt
-    sudo git clone --recursive https://github.com/MercuryWorkshop/scramjet.git
+    sudo git clone --recursive https://github.com/CheezzyBoii/scramjet-proxy.git
     sudo chown -R $USER:$USER scramjet
     print_success "Scramjet cloned to /opt/scramjet"
 else
