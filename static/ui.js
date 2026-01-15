@@ -413,6 +413,7 @@ function BrowserApp() {
       outline: none;
       color: #fff;
       height: 1.5em;
+      font-size: clamp(0.9rem, 0.5vw + 0.7rem, 1rem);
       border-radius: 0.3em;
       flex: 1;
 
@@ -436,7 +437,7 @@ function BrowserApp() {
     .nav {
       padding-top: 0.3em;
       padding-bottom: 0.3em;
-      gap: 0.3em;
+      gap: clamp(0.3em, 0.3vw + 0.2em, 0.5em);
       border-bottom: 1px solid #ff8c00;
     }
     spacer {
@@ -447,8 +448,11 @@ function BrowserApp() {
       color: #fff;
       outline: none;
       border: 1px solid #ff8c00;
-      border-radius: 0.30em;
+      border-radius: 0.3em;
       background-color: #1a1a1a;
+      font-size: clamp(0.9rem, 0.5vw + 0.7rem, 1rem);
+      padding: 0.4em 0.6em;
+      cursor: pointer;
       transition: all 0.2s ease;
     }
     .nav button:hover {
