@@ -321,7 +321,7 @@ function BrowserApp() {
     color: #e0def4;
     display: flex;
     flex-direction: column;
-    padding: clamp(0.3em, 0.6vw, 0.8em);
+    padding: 0.5em;
     padding-top: 0;
     box-sizing: border-box;
 
@@ -407,14 +407,14 @@ function BrowserApp() {
 
     input.bar {
       font-family: "Inter";
-      padding: clamp(0.3em, 0.5vw, 0.6em);
-      padding-left: clamp(0.4em, 0.8vw, 1em);
+      padding: 0.1em;
+      padding-left: 0.3em;
       border: none;
       outline: none;
       color: #fff;
-      height: clamp(2em, 3vw, 3.5em);
-      font-size: clamp(0.875rem, 1vw, 1.125rem);
-      border-radius: clamp(0.3em, 0.5vw, 0.6em);
+      height: 1.5em;
+      font-size: clamp(0.9rem, 0.5vw + 0.7rem, 1rem);
+      border-radius: 0.3em;
       flex: 1;
 
       background-color: #1a1a1a;
@@ -435,9 +435,9 @@ function BrowserApp() {
     }
 
     .nav {
-      padding-top: clamp(0.4em, 0.8vh, 0.8em);
-      padding-bottom: clamp(0.4em, 0.8vh, 0.8em);
-      gap: clamp(0.3em, 0.6vw, 0.8em);
+      padding-top: 0.3em;
+      padding-bottom: 0.3em;
+      gap: clamp(0.3em, 0.3vw + 0.2em, 0.5em);
       border-bottom: 1px solid #ff8c00;
     }
     spacer {
@@ -448,13 +448,11 @@ function BrowserApp() {
       color: #fff;
       outline: none;
       border: 1px solid #ff8c00;
-      border-radius: clamp(0.3em, 0.5vw, 0.5em);
+      border-radius: 0.30em;
       background-color: #1a1a1a;
-      padding: clamp(0.3em, 0.6vw, 0.8em) clamp(0.5em, 0.8vw, 1em);
-      font-size: clamp(0.875rem, 1vw, 1.125rem);
-      min-height: clamp(2em, 3vw, 3.5em);
+      font-size: clamp(0.9rem, 0.5vw + 0.7rem, 1rem);
+      padding: 0.4em 0.6em;
       transition: all 0.2s ease;
-      cursor: pointer;
     }
     .nav button:hover {
       background-color: rgba(255, 140, 0, 0.15);
@@ -835,7 +833,7 @@ function BrowserApp() {
       <div>
       <div class=${[flex, "nav"]}>
 
-        <img src="./devtoolsimgs/Logo.png" style="height: clamp(1.5em, 2.5vw, 3em); margin-right: clamp(0.3em, 0.6vw, 0.8em); cursor: pointer; transition: transform 0.2s ease;" onclick="window.location.href='./'" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Back to Dashboard" />
+        <img src="./devtoolsimgs/Logo.png" style="height: 1.5em; margin-right: 0.5em; cursor: pointer; transition: transform 0.2s ease;" onclick="window.location.href='./'" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Back to Dashboard" />
 
         <button on:click=${() => {
 					showLoading();
@@ -849,13 +847,13 @@ function BrowserApp() {
 					showLoading();
 					frame.reload();
 				}}>&#x21bb;</button>
-        <button on:click=${() => (window.eruditState ? (eruda.hide(), (window.eruditState = false)) : (eruda.show(), (window.eruditState = true)))} style="display: flex; align-items: center; justify-content: center; padding: clamp(0.3em, 0.6vw, 0.8em);"><img src="/devtoolsimgs/dev-tools.svg" alt="console" style="width: clamp(18px, 1.5vw, 28px); height: clamp(18px, 1.5vw, 28px);"></button>
+        <button on:click=${() => (window.eruditState ? (eruda.hide(), (window.eruditState = false)) : (eruda.show(), (window.eruditState = true)))} style="display: flex; align-items: center; justify-content: center;"><img src="/devtoolsimgs/dev-tools.svg" alt="console" style="width: 20px; height: 20px;"></button>
         <input class="bar" autocomplete="off" autocapitalize="off" autocorrect="off" 
         bind:value=${use(this.url)} on:input=${(e) => {
 					this.url = e.target.value;
 				}} on:keyup=${(e) => e.keyCode == 13 && (store.url = this.url) && handleSubmit()}></input>
 
-		<button on:click=${() => window.open(scramjet.encodeUrl(this.url))} style="display: flex; align-items: center; justify-content: center; padding: clamp(0.3em, 0.6vw, 0.8em);"><img src="/devtoolsimgs/open-link.svg" alt="open link" style="width: clamp(18px, 1.5vw, 28px); height: clamp(18px, 1.5vw, 28px);"></button>
+		<button on:click=${() => window.open(scramjet.encodeUrl(this.url))} style="display: flex; align-items: center; justify-content: center;"><img src="/devtoolsimgs/open-link.svg" alt="open link" style="width: 20px; height: 20px;"></button>
         <button on:click=${() => cfg.showModal()}>config</button>
         <button on:click=${() => {
 					showHistoryModal();
