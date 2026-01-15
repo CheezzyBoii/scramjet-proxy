@@ -335,15 +335,6 @@ function BrowserApp() {
         sans-serif;
     }
 
-    /* Responsive breakpoints for better scalability */
-    @media (max-width: 768px) {
-      padding: 0.3em;
-    }
-
-    @media (min-width: 1920px) {
-      padding: 1em;
-    }
-
     .loading-overlay {
       position: fixed;
       top: 0;
