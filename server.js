@@ -18,7 +18,13 @@ import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
 // @ts-ignore - module exists but lacks type declarations
 import { bareModulePath } from "@mercuryworkshop/bare-as-module3";
-import { chmodSync, mkdirSync, writeFileSync, existsSync, readFileSync } from "fs";
+import {
+	chmodSync,
+	mkdirSync,
+	writeFileSync,
+	existsSync,
+	readFileSync,
+} from "fs";
 import { execSync } from "node:child_process";
 
 // Function to generate self-signed certificates for development
@@ -41,7 +47,7 @@ function ensureSelfSignedCerts() {
 		// Generate self-signed certificate using openssl
 		execSync(
 			`openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' ` +
-			`-keyout "${keyPath}" -out "${certPath}" -days 365`,
+				`-keyout "${keyPath}" -out "${certPath}" -days 365`,
 			{ stdio: "inherit" }
 		);
 
@@ -154,12 +160,10 @@ if (sslCerts) {
 	const httpsFastify = Fastify({
 		// @ts-ignore - serverFactory type mismatch between http versions
 		serverFactory: (handler) => {
-			return createHttpsServer(
-				{
-					key: sslCerts.key,
-					cert: sslCerts.cert,
-				}
-			)
+			return createHttpsServer({
+				key: sslCerts.key,
+				cert: sslCerts.cert,
+			})
 				.on("request", createRequestHandler(handler))
 				.on("upgrade", createUpgradeHandler());
 		},
