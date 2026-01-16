@@ -25,7 +25,7 @@ import {
 	existsSync,
 	readFileSync,
 } from "fs";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 // Function to generate self-signed certificates for development
 function ensureSelfSignedCerts() {
@@ -45,9 +45,25 @@ function ensureSelfSignedCerts() {
 		}
 
 		// Generate self-signed certificate using openssl
-		execSync(
-			`openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' ` +
-				`-keyout "${keyPath}" -out "${certPath}" -days 365`,
+		// Using execFileSync to avoid command injection vulnerabilities
+		execFileSync(
+			"openssl",
+			[
+				"req",
+				"-x509",
+				"-newkey",
+				"rsa:2048",
+				"-nodes",
+				"-sha256",
+				"-subj",
+				"/CN=localhost",
+				"-keyout",
+				keyPath,
+				"-out",
+				certPath,
+				"-days",
+				"365",
+			],
 			{ stdio: "inherit" }
 		);
 
