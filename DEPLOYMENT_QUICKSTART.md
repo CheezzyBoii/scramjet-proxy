@@ -16,9 +16,42 @@ Your Scramjet proxy has been built and is ready for deployment. The build artifa
 
 ## 📚 Deployment Options
 
-### Option 1: Automated Deployment (Recommended)
+### Option 1: Simple Deployment (If Repo Already Set Up)
 
-Use the provided deployment script on your AWS Lightsail instance:
+If you've already cloned the repository, installed dependencies, and built the project, use the simplified deployment script:
+
+```bash
+# Make sure you're in the repository directory
+cd /path/to/scramjet-proxy
+
+# Ensure dependencies are installed
+pnpm install
+
+# Build the project
+pnpm rewriter:build
+pnpm build
+
+# Run the simple deployment script
+chmod +x deploy-simple.sh
+./deploy-simple.sh
+```
+
+The `deploy-simple.sh` script will:
+
+- Create a production server configuration
+- Set up a systemd service for Scramjet
+- Configure Nginx with HTTP (port 80) and HTTPS (port 443)
+- Generate self-signed SSL certificates
+- Start the service
+
+**Prerequisites:**
+- Repository must be cloned
+- Dependencies installed with `pnpm install`
+- Project built with `pnpm rewriter:build && pnpm build`
+
+### Option 2: Automated Full Deployment
+
+Use the provided deployment script on your AWS Lightsail instance (installs everything from scratch):
 
 ```bash
 # Upload the script to your Lightsail instance
@@ -36,11 +69,11 @@ The script will automatically:
 
 - Install all dependencies (Node.js, Rust, build tools)
 - Clone and build Scramjet
-- Set up Nginx as a reverse proxy
+- Set up Nginx as a reverse proxy with HTTP/HTTPS
 - Create and start a systemd service
 - Configure firewall rules
 
-### Option 2: Manual Deployment
+### Option 3: Manual Deployment
 
 Follow the comprehensive guide in `AWS_DEPLOYMENT_GUIDE.md` for step-by-step instructions.
 
@@ -238,7 +271,8 @@ sudo systemctl restart scramjet
 ## 📖 Documentation Files
 
 - **`AWS_DEPLOYMENT_GUIDE.md`** - Comprehensive deployment guide with detailed instructions
-- **`deploy-to-lightsail.sh`** - Automated deployment script
+- **`deploy-to-lightsail.sh`** - Full automated deployment script (installs everything from scratch)
+- **`deploy-simple.sh`** - Simple deployment script (assumes repo is already cloned and built)
 - **`README.md`** - Project documentation
 
 ---
@@ -246,9 +280,11 @@ sudo systemctl restart scramjet
 ## 🎯 Next Steps
 
 1. ✅ Build completed (You're here!)
-2. 📦 Deploy to Lightsail using `deploy-to-lightsail.sh`
-3. 🌐 Set up CloudFront distribution
-4. 🔒 Configure SSL/TLS certificates
+2. 📦 Deploy to server:
+   - Use `deploy-simple.sh` if you've already cloned and built the repo
+   - Use `deploy-to-lightsail.sh` for a fresh Lightsail instance
+3. 🌐 Set up CloudFront distribution (optional)
+4. 🔒 Configure SSL/TLS certificates with Let's Encrypt
 5. 📊 Set up monitoring and alerts
 6. 🚀 Go live!
 
