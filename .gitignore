@@ -17,6 +17,9 @@ test-results
 package-lock.json
 rebuild.sh
 
+# SSL Certificates
+certs/
+
 # Typedoc
 _docs/
 _docs-dev/
