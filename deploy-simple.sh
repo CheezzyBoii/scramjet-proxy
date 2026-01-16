@@ -1,12 +1,15 @@
 #!/bin/bash
 
-# Scramjet AWS Lightsail Deployment Script
-# This script automates the deployment of Scramjet on AWS Lightsail
+# Scramjet Simple Deployment Script
+# This script assumes you have already:
+# - Cloned the repository
+# - Installed dependencies with `pnpm install`
+# - Built the project with `pnpm rewriter:build && pnpm build`
 
 set -e
 
 echo "=========================================="
-echo "Scramjet Lightsail Deployment Script"
+echo "Scramjet Simple Deployment Script"
 echo "=========================================="
 echo ""
 
@@ -35,92 +38,43 @@ if [ "$EUID" -eq 0 ]; then
     exit 1
 fi
 
-print_info "Step 1: Updating system packages..."
-sudo apt update && sudo apt upgrade -y
-print_success "System updated"
+# Get current directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-print_info "Step 2: Installing Node.js 20.x..."
-if ! command -v node &> /dev/null; then
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-    sudo apt install -y nodejs
-    print_success "Node.js installed: $(node --version)"
-else
-    print_success "Node.js already installed: $(node --version)"
+print_info "Detected repository path: $SCRIPT_DIR"
+
+# Verify prerequisites
+print_info "Verifying prerequisites..."
+
+if [ ! -f "$SCRIPT_DIR/package.json" ]; then
+    print_error "package.json not found. Are you in the correct directory?"
+    exit 1
 fi
 
-print_info "Step 3: Installing pnpm..."
-if ! command -v pnpm &> /dev/null; then
-    sudo npm install -g pnpm
-    print_success "pnpm installed"
-else
-    print_success "pnpm already installed"
+if [ ! -d "$SCRIPT_DIR/node_modules" ]; then
+    print_error "node_modules not found. Please run 'pnpm install' first."
+    exit 1
 fi
 
-print_info "Step 4: Installing Rust..."
-if ! command -v rustc &> /dev/null; then
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    source "$HOME/.cargo/env"
-    print_success "Rust installed: $(rustc --version)"
-else
-    source "$HOME/.cargo/env"
-    print_success "Rust already installed: $(rustc --version)"
+if [ ! -d "$SCRIPT_DIR/dist" ]; then
+    print_error "dist directory not found. Please run 'pnpm build' first."
+    exit 1
 fi
 
-print_info "Step 5: Installing build dependencies..."
-sudo apt install -y build-essential git binaryen
-print_success "Build dependencies installed"
+print_success "Prerequisites verified"
 
-print_info "Step 6: Installing wasm-bindgen-cli..."
-if ! command -v wasm-bindgen &> /dev/null || [[ "$(wasm-bindgen --version | grep -o '0.2.[0-9]*')" != "0.2.100" ]]; then
-    cargo install wasm-bindgen-cli --version 0.2.100
-    print_success "wasm-bindgen-cli installed"
-else
-    print_success "wasm-bindgen-cli already installed"
-fi
-
-print_info "Step 7: Installing wasm-snip..."
-if ! command -v wasm-snip &> /dev/null; then
-    cargo install --git https://github.com/r58Playz/wasm-snip
-    print_success "wasm-snip installed"
-else
-    print_success "wasm-snip already installed"
-fi
-
-print_info "Step 8: Installing Nginx..."
+# Check if Nginx is installed
 if ! command -v nginx &> /dev/null; then
+    print_info "Installing Nginx..."
+    sudo apt update
     sudo apt install -y nginx
     print_success "Nginx installed"
 else
     print_success "Nginx already installed"
 fi
 
-print_info "Step 9: Cloning Scramjet repository..."
-if [ ! -d "/opt/scramjet" ]; then
-    cd /opt
-    sudo git clone --recursive https://github.com/CheezzyBoii/scramjet-proxy.git
-    sudo chown -R $USER:$USER scramjet
-    print_success "Scramjet cloned to /opt/scramjet"
-else
-    print_success "Scramjet directory already exists"
-fi
-
-cd /opt/scramjet
-
-print_info "Step 10: Installing npm dependencies..."
-pnpm install
-print_success "Dependencies installed"
-
-print_info "Step 11: Building WASM rewriter..."
-source "$HOME/.cargo/env"
-pnpm rewriter:build
-print_success "WASM rewriter built"
-
-print_info "Step 12: Building Scramjet..."
-pnpm build
-print_success "Scramjet built successfully"
-
-print_info "Step 13: Creating production server configuration..."
-cat > /opt/scramjet/server-production.js << 'EOF'
+print_info "Step 1: Creating production server configuration..."
+cat > "$SCRIPT_DIR/server-production.js" << 'EOF'
 // Production server
 import { createBareServer } from "@nebula-services/bare-server-node";
 import { createServer } from "http";
@@ -217,7 +171,7 @@ fastify.listen(
 EOF
 print_success "Production server configuration created"
 
-print_info "Step 14: Creating systemd service..."
+print_info "Step 2: Creating systemd service..."
 sudo tee /etc/systemd/system/scramjet.service > /dev/null << EOF
 [Unit]
 Description=Scramjet Proxy Server
@@ -226,10 +180,10 @@ After=network.target
 [Service]
 Type=simple
 User=$USER
-WorkingDirectory=/opt/scramjet
+WorkingDirectory=$SCRIPT_DIR
 Environment="PATH=$HOME/.cargo/bin:/usr/bin:/bin:/usr/local/bin"
 Environment="NODE_ENV=production"
-ExecStart=/usr/bin/node server-production.js
+ExecStart=$(which node) server-production.js
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal
@@ -243,7 +197,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable scramjet
 print_success "Systemd service created and enabled"
 
-print_info "Step 15: Configuring Nginx..."
+print_info "Step 3: Configuring Nginx..."
 sudo tee /etc/nginx/sites-available/scramjet > /dev/null << 'EOF'
 server {
     listen 80;
@@ -309,7 +263,7 @@ server {
 }
 EOF
 
-print_info "Step 15a: Generating SSL certificates for Nginx..."
+print_info "Step 3a: Generating SSL certificates for Nginx..."
 sudo mkdir -p /etc/nginx/ssl
 if [ ! -f /etc/nginx/ssl/cert.pem ]; then
     sudo openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' \
@@ -325,7 +279,7 @@ sudo nginx -t
 sudo systemctl restart nginx
 print_success "Nginx configured and restarted"
 
-print_info "Step 16: Starting Scramjet service..."
+print_info "Step 4: Starting Scramjet service..."
 sudo systemctl start scramjet
 sleep 3
 if sudo systemctl is-active --quiet scramjet; then
@@ -356,6 +310,6 @@ print_info "Useful Commands:"
 echo "  - View logs: sudo journalctl -u scramjet -f"
 echo "  - Restart service: sudo systemctl restart scramjet"
 echo "  - Stop service: sudo systemctl stop scramjet"
-echo "  - Update Scramjet: cd /opt/scramjet && git pull && pnpm install && pnpm rewriter:build && pnpm build && sudo systemctl restart scramjet"
+echo "  - Update Scramjet: cd $SCRIPT_DIR && git pull && pnpm install && pnpm rewriter:build && pnpm build && sudo systemctl restart scramjet"
 echo ""
 print_success "Happy proxying! 🚀"
