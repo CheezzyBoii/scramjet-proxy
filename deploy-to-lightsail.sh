@@ -273,7 +273,51 @@ server {
         proxy_pass http://localhost:3000;
     }
 }
+
+server {
+    listen 443 ssl;
+    server_name _;
+
+    ssl_certificate /etc/nginx/ssl/cert.pem;
+    ssl_certificate_key /etc/nginx/ssl/key.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    client_max_body_size 100M;
+    proxy_buffer_size 128k;
+    proxy_buffers 4 256k;
+    proxy_busy_buffers_size 256k;
+
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_buffering off;
+    proxy_request_buffering off;
+
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 60s;
+    proxy_read_timeout 60s;
+
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+}
 EOF
+
+print_info "Step 15a: Generating SSL certificates for Nginx..."
+sudo mkdir -p /etc/nginx/ssl
+if [ ! -f /etc/nginx/ssl/cert.pem ]; then
+    sudo openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' \
+        -keyout /etc/nginx/ssl/key.pem -out /etc/nginx/ssl/cert.pem -days 365
+    print_success "SSL certificates generated"
+else
+    print_success "SSL certificates already exist"
+fi
 
 sudo ln -sf /etc/nginx/sites-available/scramjet /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
@@ -301,9 +345,12 @@ sudo systemctl status scramjet --no-pager -l
 echo ""
 print_info "Next Steps:"
 echo "  1. Get your server's IP address: curl ifconfig.me"
-echo "  2. Test in browser: http://YOUR_IP"
+echo "  2. Test in browser:"
+echo "     - HTTP:  http://YOUR_IP"
+echo "     - HTTPS: https://YOUR_IP (self-signed cert, browser will warn)"
 echo "  3. Configure CloudFront (see AWS_DEPLOYMENT_GUIDE.md)"
-echo "  4. Set up SSL with: sudo certbot --nginx -d your-domain.com"
+echo "  4. For production with proper SSL, set up with: sudo certbot --nginx -d your-domain.com"
+echo "     (This will replace the self-signed certificate with a Let's Encrypt certificate)"
 echo ""
 print_info "Useful Commands:"
 echo "  - View logs: sudo journalctl -u scramjet -f"
